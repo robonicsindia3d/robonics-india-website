@@ -101,6 +101,20 @@ const AdminDashboard = () => {
     }
   };
 
+  const deleteCoupon = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this coupon?')) return;
+    const apiUrl = import.meta.env.VITE_API_URL || '';
+    try {
+      await fetch(`${apiUrl}/api/admin/coupons/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      fetchData();
+    } catch (e) {
+      alert("Failed to delete coupon");
+    }
+  };
+
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -342,12 +356,18 @@ const AdminDashboard = () => {
                                 {coupon.is_active ? 'Active' : 'Inactive'}
                               </span>
                             </td>
-                            <td style={{ padding: '1rem' }}>
+                            <td style={{ padding: '1rem', display: 'flex', gap: '1rem' }}>
                               <button 
                                 onClick={() => toggleCoupon(coupon.id, coupon.is_active)}
                                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: coupon.is_active ? '#ef4444' : '#10b981', fontWeight: 'bold' }}
                               >
                                 {coupon.is_active ? 'Deactivate' : 'Activate'}
+                              </button>
+                              <button 
+                                onClick={() => deleteCoupon(coupon.id)}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', fontSize: '0.8rem' }}
+                              >
+                                Delete
                               </button>
                             </td>
                           </tr>

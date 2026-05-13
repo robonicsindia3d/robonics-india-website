@@ -349,6 +349,25 @@ app.post('/api/admin/coupons', authenticateAdmin, async (req, res) => {
   }
 });
 
+app.put('/api/admin/coupons/:id/toggle', authenticateAdmin, async (req, res) => {
+  const { is_active } = req.body;
+  try {
+    await pool.query('UPDATE coupons SET is_active = $1 WHERE id = $2', [is_active ? 1 : 0, req.params.id]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+app.delete('/api/admin/coupons/:id', authenticateAdmin, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM coupons WHERE id = $1', [req.params.id]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 app.post('/api/coupons/validate', async (req, res) => {
   const { code } = req.body;
   try {
