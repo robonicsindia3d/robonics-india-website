@@ -31,11 +31,12 @@ const AdminDashboard = () => {
 
   const fetchData = async () => {
     setLoading(true);
+    const apiUrl = import.meta.env.VITE_API_URL || '';
     try {
       const [ordersRes, couponsRes, productsRes] = await Promise.all([
-        fetch(`${import.meta.env.VITE_API_URL}/api/admin/orders`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`${import.meta.env.VITE_API_URL}/api/admin/coupons`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`${import.meta.env.VITE_API_URL}/api/products`)
+        fetch(`${apiUrl}/api/admin/orders`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${apiUrl}/api/admin/coupons`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${apiUrl}/api/products`)
       ]);
       const ordersData = await ordersRes.json();
       const couponsData = await couponsRes.json();
@@ -52,8 +53,9 @@ const AdminDashboard = () => {
   };
 
   const updateOrderStatus = async (id, status) => {
+    const apiUrl = import.meta.env.VITE_API_URL || '';
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/admin/orders/${id}/status`, {
+      await fetch(`${apiUrl}/api/admin/orders/${id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ status })
@@ -66,8 +68,9 @@ const AdminDashboard = () => {
 
   const createCoupon = async (e) => {
     e.preventDefault();
+    const apiUrl = import.meta.env.VITE_API_URL || '';
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/coupons`, {
+      const res = await fetch(`${apiUrl}/api/admin/coupons`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ code: newCoupon.code, discount_type: newCoupon.type, discount_value: newCoupon.value })
@@ -85,8 +88,9 @@ const AdminDashboard = () => {
   };
 
   const toggleCoupon = async (id, currentStatus) => {
+    const apiUrl = import.meta.env.VITE_API_URL || '';
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/admin/coupons/${id}/toggle`, {
+      await fetch(`${apiUrl}/api/admin/coupons/${id}/toggle`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ is_active: !currentStatus })
@@ -101,12 +105,13 @@ const AdminDashboard = () => {
     const file = e.target.files[0];
     if (!file) return;
     
+    const apiUrl = import.meta.env.VITE_API_URL || '';
     setUploadingImage(true);
     const formData = new FormData();
     formData.append('image', file);
     
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/upload`, {
+      const res = await fetch(`${apiUrl}/api/admin/upload`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
@@ -130,8 +135,9 @@ const AdminDashboard = () => {
       alert("Please upload an image first.");
       return;
     }
+    const apiUrl = import.meta.env.VITE_API_URL || '';
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/products`, {
+      const res = await fetch(`${apiUrl}/api/admin/products`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(newProduct)
@@ -150,8 +156,9 @@ const AdminDashboard = () => {
   };
 
   const updateStock = async (productId, newStock) => {
+    const apiUrl = import.meta.env.VITE_API_URL || '';
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/admin/products/${productId}/stock`, {
+      await fetch(`${apiUrl}/api/admin/products/${productId}/stock`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ stock: parseInt(newStock) })
