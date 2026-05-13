@@ -41,7 +41,6 @@ const Checkout = () => {
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [saveAddress, setSaveAddress] = useState(false);
-  const [saveAddressLabel, setSaveAddressLabel] = useState('Home');
 
   const subtotal = getCartTotal();
   const [shippingCost, setShippingCost] = useState(99);
@@ -58,8 +57,6 @@ const Checkout = () => {
         .then(data => {
           if (data.success && data.addresses.length > 0) {
             setSavedAddresses(data.addresses);
-            const defaultAddr = data.addresses.find(a => a.is_default) || data.addresses[0];
-            if (defaultAddr) selectAddress(defaultAddr);
           }
         })
         .catch(err => console.error('Failed to fetch addresses', err));
@@ -138,13 +135,36 @@ const Checkout = () => {
   
   const total = subtotal + shippingCost - discount;
 
-  const nextStep = (e) => {
+  const nextStep = async (e) => {
     e.preventDefault();
     if (step === 1) {
       if (!formData.billingPincode) {
         alert("Please enter a valid PIN code");
         return;
       }
+      
+      // Save address if checked
+      if (saveAddress && token) {
+        const apiUrl = import.meta.env.VITE_API_URL || '';
+        try {
+          await fetch(`${apiUrl}/api/addresses`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({
+              label: 'Other',
+              full_name: `${formData.firstName} ${formData.lastName}`,
+              phone: formData.phone,
+              address_line1: formData.billingAddress1,
+              address_line2: formData.billingAddress2,
+              city: formData.billingCity,
+              state: formData.billingState,
+              pincode: formData.billingPincode,
+              is_default: savedAddresses.length === 0
+            })
+          });
+        } catch (e) { console.error("Failed to save address"); }
+      }
+
       setStep(2);
       window.scrollTo(0, 0);
     }
@@ -250,7 +270,6 @@ const Checkout = () => {
   return (
     <div className="page-transition animate-fade-in checkout-page" style={{ paddingTop: '8rem', paddingBottom: '6rem' }}>
       <div className="container">
-        {/* Step Indicator */}
         <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '3rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: step >= 1 ? 'var(--primary-blue)' : 'var(--text-secondary)', fontWeight: 700 }}>
             <span style={{ width: '24px', height: '24px', borderRadius: '50%', background: step >= 1 ? 'var(--primary-blue)' : 'var(--border-color)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}>1</span>
@@ -280,7 +299,7 @@ const Checkout = () => {
                 </div>
 
                 <div className="form-group-section">
-                  <h2>Shipping Address</h2>
+                  <h2>Billing Address</h2>
                   {savedAddresses.length > 0 && (
                     <div style={{ marginBottom: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
                       {savedAddresses.map(addr => (
@@ -299,8 +318,35 @@ const Checkout = () => {
                     </div>
                     <input required type="text" name="billingPincode" placeholder="PIN Code (6 digits)" value={formData.billingPincode} onChange={handleChange} />
                   </div>
+
+                  {token && !selectedAddressId && (
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem', cursor: 'pointer', fontSize: '0.9rem' }}>
+                      <input type="checkbox" checked={saveAddress} onChange={(e) => setSaveAddress(e.target.checked)} style={{ width: 'auto' }} />
+                      Save this address for future use
+                    </label>
+                  )}
+
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem', cursor: 'pointer', fontSize: '0.9rem' }}>
+                    <input type="checkbox" name="sameAsBilling" checked={formData.sameAsBilling} onChange={handleChange} style={{ width: 'auto' }} />
+                    Shipping address is same as billing
+                  </label>
                 </div>
-                <button type="submit" className="btn-primary" style={{ marginTop: '1rem', width: '100%', padding: '1rem' }}>
+
+                {!formData.sameAsBilling && (
+                  <div className="form-group-section animate-fade-in">
+                    <h2>Shipping Address</h2>
+                    <div className="checkout-input-group">
+                      <input required type="text" name="shippingAddress1" placeholder="Address (House No, Street, Area)" value={formData.shippingAddress1} onChange={handleChange} />
+                      <div className="checkout-input-row">
+                        <input required type="text" name="shippingCity" placeholder="City" value={formData.shippingCity} onChange={handleChange} />
+                        <input required type="text" name="shippingState" placeholder="State" value={formData.shippingState} onChange={handleChange} />
+                      </div>
+                      <input required type="text" name="shippingPincode" placeholder="PIN Code (6 digits)" value={formData.shippingPincode} onChange={handleChange} />
+                    </div>
+                  </div>
+                )}
+
+                <button type="submit" className="btn-primary" style={{ marginTop: '2rem', width: '100%', padding: '1.25rem', fontSize: '1.1rem' }}>
                   Continue to Payment <ArrowRight size={18} style={{ marginLeft: '0.5rem' }} />
                 </button>
               </form>
@@ -331,7 +377,7 @@ const Checkout = () => {
                 </div>
 
                 <div className="form-group-section">
-                  <h2>Review Shipping Address</h2>
+                  <h2>Delivery Summary</h2>
                   <div style={{ padding: '1.25rem', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                     <strong>{formData.firstName} {formData.lastName}</strong><br />
                     {formData.billingAddress1}, {formData.billingCity}, {formData.billingState} - {formData.billingPincode}<br />
