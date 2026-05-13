@@ -71,12 +71,18 @@ const ProductDetails = () => {
           {/* Left Column: Image Gallery */}
           <div className="product-gallery">
             <div className="main-image-container">
-              <img src={encodeURI(mainImage)} alt={product.name} className="main-image" />
+              <img 
+                src={encodeURI(mainImage || product.image)} 
+                alt={product.name} 
+                className="main-image" 
+                onError={(e) => { e.target.src = '/Images/placeholder.jpg'; }}
+              />
             </div>
             
-            {product.images && product.images.length > 1 && (
+            {product.images && product.images.length > 0 && (
               <div className="thumbnail-list">
-                {product.images.slice(0, 10).map((img, idx) => (
+                {/* Ensure the main image is included if not in the list, and remove duplicates */}
+                {[...new Set([product.image, ...product.images])].slice(0, 15).map((img, idx) => (
                   <button 
                     key={idx} 
                     className={`thumbnail-btn ${mainImage === img ? 'active' : ''}`}
