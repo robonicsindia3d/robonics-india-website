@@ -126,12 +126,14 @@ const Checkout = () => {
           if (data.success) {
             setShippingCost(data.shippingCost);
             setIsFreeShipping(data.isFree || false);
-            setHasCalculatedShipping(true);
+          } else {
+            setShippingCost(80);
           }
-          else setShippingCost(80);
+          setHasCalculatedShipping(true);
         } catch (err) {
           console.error("Shipping calc failed", err);
           setShippingCost(80);
+          setHasCalculatedShipping(true);
         } finally {
           setIsCalculatingShipping(false);
         }
