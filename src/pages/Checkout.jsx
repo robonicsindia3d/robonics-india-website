@@ -43,9 +43,12 @@ const Checkout = () => {
   const [saveAddress, setSaveAddress] = useState(false);
 
   const subtotal = getCartTotal();
-  const [shippingCost, setShippingCost] = useState(0);
-  const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
-  const [hasCalculatedShipping, setHasCalculatedShipping] = useState(false);
+  
+  // --- Simplified Shipping Rules ---
+  // Flat ₹99 for orders < 1500, else Free
+  const isFreeShipping = subtotal >= 1500;
+  const shippingCost = isFreeShipping ? 0 : 99;
+  const total = Math.max(0, subtotal + shippingCost - discount);
 
   // Fetch saved addresses
   useEffect(() => {
@@ -94,7 +97,7 @@ const Checkout = () => {
       if (data.success) {
         const { discount_type, discount_value } = data.coupon;
         let amount = discount_type === 'percent' ? subtotal * (discount_value / 100) : discount_value;
-        setDiscount(Math.min(amount, subtotal));
+        setDiscount(amount);
         setCouponStatus('Applied successfully!');
       } else {
         setDiscount(0);
@@ -106,55 +109,9 @@ const Checkout = () => {
     }
   };
 
-  const [isFreeShipping, setIsFreeShipping] = useState(false);
-
-  // Dynamic Shipping Calculation
-  useEffect(() => {
-    const pincode = formData.sameAsBilling ? formData.billingPincode : formData.shippingPincode;
-    const apiUrl = import.meta.env.VITE_API_URL || '';
-    
-    if (pincode && pincode.length === 6 && /^\d+$/.test(pincode)) {
-      const calculateShipping = async () => {
-        setIsCalculatingShipping(true);
-        try {
-          const res = await fetch(`${apiUrl}/api/calculate-shipping`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ pincode, items: cartItems, paymentMethod })
-          });
-          const data = await res.json();
-          if (data.success) {
-            setShippingCost(data.shippingCost);
-            setIsFreeShipping(data.isFree || false);
-          } else {
-            setShippingCost(80);
-          }
-          setHasCalculatedShipping(true);
-        } catch (err) {
-          console.error("Shipping calc failed", err);
-          setShippingCost(80);
-          setHasCalculatedShipping(true);
-        } finally {
-          setIsCalculatingShipping(false);
-        }
-      };
-      const timer = setTimeout(calculateShipping, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [formData.billingPincode, formData.shippingPincode, formData.sameAsBilling, cartItems, paymentMethod]);
-  
-  // Instant Free Shipping Override
-  const displayShipping = subtotal >= 1500 ? 0 : shippingCost;
-  const total = Math.max(0, subtotal + displayShipping - discount);
-
   const nextStep = async (e) => {
     e.preventDefault();
     if (step === 1) {
-      if (!formData.billingPincode) {
-        alert("Please enter a valid PIN code");
-        return;
-      }
-      
       if (saveAddress && token) {
         const apiUrl = import.meta.env.VITE_API_URL || '';
         try {
@@ -175,7 +132,6 @@ const Checkout = () => {
           });
         } catch (e) { console.error("Failed to save address"); }
       }
-
       setStep(2);
       window.scrollTo(0, 0);
     }
@@ -207,14 +163,13 @@ const Checkout = () => {
           clearCart();
         } else throw new Error('Order failed');
       } catch (err) {
-        alert("Failed to place order. Please check your network.");
+        alert("Failed to place order.");
       } finally {
         setIsProcessing(false);
       }
       return;
     }
 
-    // Online Payment Flow
     try {
       const orderRes = await fetch(`${apiUrl}/api/create-order`, {
         method: 'POST',
@@ -249,7 +204,7 @@ const Checkout = () => {
       const rzp1 = new window.Razorpay(options);
       rzp1.open();
     } catch (error) {
-      alert("Payment Error. Please try again.");
+      alert("Payment Error.");
       setIsProcessing(false);
     }
   };
@@ -312,9 +267,6 @@ const Checkout = () => {
                 <div className="form-group-section">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                     <h2>Shipping Details</h2>
-                    <div style={{ padding: '0.5rem 1rem', background: '#f0f9ff', borderRadius: '999px', border: '1px solid #bae6fd', fontSize: '0.8rem', color: '#0369a1', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <MapPin size={14} /> Pincode based shipping
-                    </div>
                   </div>
 
                   {savedAddresses.length > 0 && (
@@ -337,7 +289,7 @@ const Checkout = () => {
                       <input required type="text" name="billingCity" placeholder="City" value={formData.billingCity} onChange={handleChange} />
                       <input required type="text" name="billingState" placeholder="State" value={formData.billingState} onChange={handleChange} />
                     </div>
-                    <input required type="text" name="billingPincode" placeholder="PIN Code (6 digits)" value={formData.billingPincode} onChange={handleChange} />
+                    <input required type="text" name="billingPincode" placeholder="PIN Code" value={formData.billingPincode} onChange={handleChange} />
                   </div>
 
                   <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -364,7 +316,7 @@ const Checkout = () => {
                         <input required type="text" name="shippingCity" placeholder="City" value={formData.shippingCity} onChange={handleChange} />
                         <input required type="text" name="shippingState" placeholder="State" value={formData.shippingState} onChange={handleChange} />
                       </div>
-                      <input required type="text" name="shippingPincode" placeholder="PIN Code (6 digits)" value={formData.shippingPincode} onChange={handleChange} />
+                      <input required type="text" name="shippingPincode" placeholder="PIN Code" value={formData.shippingPincode} onChange={handleChange} />
                     </div>
                   </div>
                 )}
@@ -380,41 +332,27 @@ const Checkout = () => {
                 </button>
 
                 <div className="form-group-section">
-                  <h2>How would you like to pay?</h2>
+                  <h2>Payment</h2>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', padding: '1.5rem', border: `2px solid ${paymentMethod === 'online' ? 'var(--primary-blue)' : 'var(--border-color)'}`, borderRadius: 'var(--radius-lg)', cursor: 'pointer', background: paymentMethod === 'online' ? '#eff6ff' : 'white', transition: 'all 0.2s' }}>
                       <input type="radio" name="payMethod" checked={paymentMethod === 'online'} onChange={() => setPaymentMethod('online')} style={{ transform: 'scale(1.3)' }} />
                       <div>
-                        <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>Pay Online (UPI / Card / Netbanking)</div>
-                        <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Fastest and most secure way to pay</div>
+                        <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>Pay Online</div>
+                        <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Secure payment via Razorpay</div>
                       </div>
                     </label>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', padding: '1.5rem', border: `2px solid ${paymentMethod === 'cod' ? 'var(--primary-blue)' : 'var(--border-color)'}`, borderRadius: 'var(--radius-lg)', cursor: 'pointer', background: paymentMethod === 'cod' ? '#eff6ff' : 'white', transition: 'all 0.2s' }}>
                       <input type="radio" name="payMethod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} style={{ transform: 'scale(1.3)' }} />
                       <div>
-                        <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>Cash on Delivery (COD)</div>
-                        <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Pay at your doorstep on delivery</div>
+                        <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>Cash on Delivery</div>
+                        <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Pay at your doorstep</div>
                       </div>
                     </label>
                   </div>
                 </div>
 
-                <div className="form-group-section">
-                  <h2>Order Summary</h2>
-                  <div style={{ padding: '1.25rem', background: '#f8fafc', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
-                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-                      <MapPin size={20} style={{ color: 'var(--primary-blue)' }} />
-                      <div style={{ fontSize: '0.95rem', lineHeight: 1.5 }}>
-                        <strong>{formData.firstName} {formData.lastName}</strong><br />
-                        {formData.billingAddress1}, {formData.billingCity}, {formData.billingState} - {formData.billingPincode}<br />
-                        <span style={{ color: 'var(--text-secondary)' }}>Phone: {formData.phone}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <button onClick={handlePayment} className="btn-primary" disabled={isProcessing} style={{ width: '100%', padding: '1.5rem', marginTop: '1rem', fontSize: '1.2rem', fontWeight: 800, boxShadow: '0 10px 15px -3px rgba(30, 64, 175, 0.3)' }}>
-                  {isProcessing ? 'Verifying...' : (paymentMethod === 'cod' ? 'Confirm Order' : `Pay ₹${total.toFixed(0)} Now`)}
+                <button onClick={handlePayment} className="btn-primary" disabled={isProcessing} style={{ width: '100%', padding: '1.5rem', marginTop: '1rem', fontSize: '1.2rem', fontWeight: 800 }}>
+                  {isProcessing ? 'Processing...' : (paymentMethod === 'cod' ? 'Confirm Order' : `Pay ₹${total.toFixed(0)} Now`)}
                 </button>
               </div>
             )}
@@ -426,24 +364,24 @@ const Checkout = () => {
                 
                 {/* Free Shipping Promotion */}
                 <div style={{ 
-                  background: subtotal >= 1500 ? '#f0fdf4' : '#eff6ff',
+                  background: isFreeShipping ? '#f0fdf4' : '#eff6ff',
                   padding: '0.75rem', 
                   borderRadius: 'var(--radius-md)', 
                   marginBottom: '1rem',
-                  border: `1px solid ${subtotal >= 1500 ? '#bbf7d0' : '#bfdbfe'}`,
+                  border: `1px solid ${isFreeShipping ? '#bbf7d0' : '#bfdbfe'}`,
                   fontSize: '0.8rem',
                   fontWeight: 600,
-                  color: subtotal >= 1500 ? '#166534' : '#1e40af',
+                  color: isFreeShipping ? '#166534' : '#1e40af',
                   textAlign: 'center'
                 }}>
-                  {subtotal >= 1500 ? '🎉 Free Shipping Unlocked!' : `🚚 Add ₹${1500 - subtotal} more for FREE Shipping!`}
+                  {isFreeShipping ? '🎉 Free Shipping Unlocked!' : `🚚 Add ₹${1500 - subtotal} more for FREE Shipping!`}
                 </div>
 
                 <div className="summary-items">
                   {cartItems.map(item => (
-                    <div key={item.cartItemId} className="summary-item-row" style={{ alignItems: 'flex-start' }}>
-                      <span style={{ fontWeight: 600 }}>{item.quantity}x {item.name}</span>
-                      <span style={{ fontWeight: 700 }}>₹{item.price * item.quantity}</span>
+                    <div key={item.cartItemId} className="summary-item-row">
+                      <span>{item.quantity}x {item.name}</span>
+                      <span>₹{item.price * item.quantity}</span>
                     </div>
                   ))}
                 </div>
@@ -456,21 +394,19 @@ const Checkout = () => {
                   {couponStatus && <p style={{ fontSize: '0.85rem', marginTop: '0.5rem', color: discount > 0 ? '#10b981' : '#ef4444', fontWeight: 600 }}>{couponStatus}</p>}
                 </div>
 
-                  <div className="summary-totals" style={{ marginTop: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
-                    <div className="summary-item-row" style={{ fontSize: '0.95rem' }}><span>Subtotal</span><span>₹{subtotal}</span></div>
-                    <div className="summary-item-row" style={{ fontSize: '0.95rem' }}>
-                      <span>Shipping</span>
-                      <span style={{ color: subtotal >= 1500 ? '#10b981' : 'inherit', fontWeight: subtotal >= 1500 ? 700 : 'inherit' }}>
-                        {subtotal >= 1500 ? 'FREE' : 
-                         isCalculatingShipping ? '...' : 
-                         hasCalculatedShipping ? `₹${shippingCost}` : 'Enter Pincode'}
-                      </span>
-                    </div>
-                    {discount > 0 && <div className="summary-item-row" style={{ color: '#10b981', fontWeight: 600 }}><span>Discount Applied</span><span>-₹{discount.toFixed(0)}</span></div>}
-                    <div className="summary-item-row total-row" style={{ fontSize: '1.4rem', borderTop: '2px solid #e2e8f0', paddingTop: '1rem', marginTop: '1rem', color: 'var(--text-primary)' }}>
-                      <span>Total</span><span>₹{total.toFixed(0)}</span>
-                    </div>
+                <div className="summary-totals" style={{ marginTop: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
+                  <div className="summary-item-row"><span>Subtotal</span><span>₹{subtotal}</span></div>
+                  <div className="summary-item-row">
+                    <span>Shipping</span>
+                    <span style={{ color: isFreeShipping ? '#10b981' : 'inherit', fontWeight: isFreeShipping ? 700 : 'inherit' }}>
+                      {isFreeShipping ? 'FREE' : `₹${shippingCost}`}
+                    </span>
                   </div>
+                  {discount > 0 && <div className="summary-item-row" style={{ color: '#10b981', fontWeight: 600 }}><span>Discount Applied</span><span>-₹{discount.toFixed(0)}</span></div>}
+                  <div className="summary-item-row total-row" style={{ fontSize: '1.4rem', borderTop: '2px solid #e2e8f0', paddingTop: '1rem', marginTop: '1rem' }}>
+                    <span>Total</span><span>₹{total.toFixed(0)}</span>
+                  </div>
+                </div>
                 <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
                   <ShieldCheck size={16} /> 100% Secure Checkout
                 </div>

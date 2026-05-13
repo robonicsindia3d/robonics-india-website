@@ -129,11 +129,13 @@ const Cart = () => {
             </div>
             <div className="summary-row">
               <span>Shipping</span>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Calculated at checkout</span>
+              <span style={{ fontWeight: subtotal >= 1500 ? 700 : 400, color: subtotal >= 1500 ? '#10b981' : 'inherit' }}>
+                {subtotal >= 1500 ? 'FREE' : '₹99'}
+              </span>
             </div>
             <div className="summary-row total-row">
               <span>Total</span>
-              <span>₹{subtotal}</span>
+              <span>₹{subtotal >= 1500 ? subtotal : subtotal + 99}</span>
             </div>
             
             <button className="btn-primary checkout-btn" onClick={() => navigate('/checkout')}>
