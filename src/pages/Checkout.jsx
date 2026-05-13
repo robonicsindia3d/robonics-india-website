@@ -48,8 +48,9 @@ const Checkout = () => {
 
   // Fetch saved addresses
   useEffect(() => {
+    const apiUrl = import.meta.env.VITE_API_URL || '';
     if (token) {
-      fetch(`${import.meta.env.VITE_API_URL}/api/addresses`, {
+      fetch(`${apiUrl}/api/addresses`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
         .then(res => res.json())
@@ -85,10 +86,11 @@ const Checkout = () => {
 
   // Save address to backend after successful order
   const saveAddressAfterOrder = async () => {
+    const apiUrl = import.meta.env.VITE_API_URL || '';
     if (!token || !saveAddress) return; // Only save if user opted in
     if (!formData.billingAddress1 || !formData.billingCity || !formData.billingState || !formData.billingPincode) return;
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/addresses`, {
+      await fetch(`${apiUrl}/api/addresses`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
@@ -111,8 +113,9 @@ const Checkout = () => {
   const handleApplyCoupon = async (e) => {
     e.preventDefault();
     if (!couponCode.trim()) return;
+    const apiUrl = import.meta.env.VITE_API_URL || '';
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/coupons/validate`, {
+      const res = await fetch(`${apiUrl}/api/coupons/validate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: couponCode.trim() })
@@ -143,12 +146,13 @@ const Checkout = () => {
   // Dynamic Shipping Calculation
   useEffect(() => {
     const pincode = formData.sameAsBilling ? formData.billingPincode : formData.shippingPincode;
+    const apiUrl = import.meta.env.VITE_API_URL || '';
     
     if (pincode && pincode.length === 6 && /^\d+$/.test(pincode)) {
       const calculateShipping = async () => {
         setIsCalculatingShipping(true);
         try {
-          const res = await fetch(`${import.meta.env.VITE_API_URL}/api/calculate-shipping`, {
+          const res = await fetch(`${apiUrl}/api/calculate-shipping`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -213,6 +217,7 @@ const Checkout = () => {
   const handlePayment = async (e) => {
     e.preventDefault();
     setIsProcessing(true);
+    const apiUrl = import.meta.env.VITE_API_URL || '';
 
     const fullName = `${formData.firstName} ${formData.lastName}`.trim();
     
@@ -223,7 +228,7 @@ const Checkout = () => {
 
     if (paymentMethod === 'cod') {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/place-cod-order`, {
+        const res = await fetch(`${apiUrl}/api/place-cod-order`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -251,7 +256,7 @@ const Checkout = () => {
         }
       } catch (err) {
         console.error(err);
-        alert("Failed to place order. Is the backend running?");
+        alert("Failed to place order. Please try again.");
         setIsProcessing(false);
       }
       return;
@@ -260,7 +265,7 @@ const Checkout = () => {
     // Online Payment Flow
     try {
       // 1. Ask our backend to securely create a Razorpay Order
-      const orderRes = await fetch(`${import.meta.env.VITE_API_URL}/api/create-order`, {
+      const orderRes = await fetch(`${apiUrl}/api/create-order`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -295,7 +300,7 @@ const Checkout = () => {
         handler: async function (response) {
           // 3. Verify Payment Signature on Backend
           try {
-            const verifyRes = await fetch(`${import.meta.env.VITE_API_URL}/api/verify-payment`, {
+            const verifyRes = await fetch(`${apiUrl}/api/verify-payment`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -342,7 +347,7 @@ const Checkout = () => {
       rzp1.open();
     } catch (error) {
       console.error("Payment Error:", error);
-      alert("Failed to initialize payment gateway. Is the backend running?");
+      alert("Failed to initialize payment gateway. Please try again.");
       setIsProcessing(false);
     }
   };
