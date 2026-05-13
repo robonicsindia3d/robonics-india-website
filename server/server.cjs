@@ -199,6 +199,7 @@ app.get('/api/products', async (req, res) => {
     }));
     res.json({ success: true, products: formatted });
   } catch (error) {
+    console.error('❌ Error fetching products:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
