@@ -68,6 +68,17 @@ const decrementStock = async (itemsJson) => {
     console.error('Error parsing items for stock decrement:', e);
   }
 };
+// Helper function to increment stock
+const incrementStock = async (itemsJson) => {
+  try {
+    const items = typeof itemsJson === 'string' ? JSON.parse(itemsJson) : itemsJson;
+    for (const item of items) {
+      await pool.query('UPDATE products SET stock = stock + $1 WHERE id = $2', [item.quantity || 1, item.id]);
+    }
+  } catch (e) {
+    console.error('Error parsing items for stock increment:', e);
+  }
+};
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
 
@@ -303,9 +314,27 @@ app.post('/api/place-cod-order', optionalAuth, async (req, res) => {
 app.put('/api/admin/orders/:id/status', authenticateAdmin, async (req, res) => {
   const { status } = req.body;
   try {
+    // Get current status to check if we are changing TO cancelled
+    const { rows } = await pool.query('SELECT status, items FROM orders WHERE id = $1', [req.params.id]);
+    if (rows.length === 0) return res.status(404).json({ success: false, message: 'Order not found' });
+    
+    const oldStatus = rows[0].status;
+    const items = rows[0].items;
+
     await pool.query('UPDATE orders SET status = $1 WHERE id = $2', [status, req.params.id]);
+    
+    // If status changed TO cancelled, return stock
+    if (status === 'cancelled' && oldStatus !== 'cancelled') {
+      await incrementStock(items);
+    } 
+    // If status changed FROM cancelled back to anything else, decrement stock again
+    else if (oldStatus === 'cancelled' && status !== 'cancelled') {
+      await decrementStock(items);
+    }
+
     res.json({ success: true });
   } catch (error) {
+    console.error('❌ Error updating order status:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });

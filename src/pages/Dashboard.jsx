@@ -39,12 +39,13 @@ const Dashboard = () => {
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
+    const apiUrl = import.meta.env.VITE_API_URL || '';
     try {
       const [ordersRes, addressRes] = await Promise.all([
-        fetch(`${import.meta.env.VITE_API_URL}/api/orders/me`, {
+        fetch(`${apiUrl}/api/orders/me`, {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch(`${import.meta.env.VITE_API_URL}/api/addresses`, {
+        fetch(`${apiUrl}/api/addresses`, {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
@@ -89,9 +90,10 @@ const Dashboard = () => {
 
   const handleSaveAddress = async (e) => {
     e.preventDefault();
+    const apiUrl = import.meta.env.VITE_API_URL || '';
     const url = editingAddress
-      ? `${import.meta.env.VITE_API_URL}/api/addresses/${editingAddress.id}`
-      : `${import.meta.env.VITE_API_URL}/api/addresses`;
+      ? `${apiUrl}/api/addresses/${editingAddress.id}`
+      : `${apiUrl}/api/addresses`;
     const method = editingAddress ? 'PUT' : 'POST';
 
     try {
@@ -114,8 +116,9 @@ const Dashboard = () => {
 
   const handleDeleteAddress = async (id) => {
     if (!window.confirm('Delete this address?')) return;
+    const apiUrl = import.meta.env.VITE_API_URL || '';
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/addresses/${id}`, {
+      await fetch(`${apiUrl}/api/addresses/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -126,8 +129,9 @@ const Dashboard = () => {
   };
 
   const handleSetDefault = async (addr) => {
+    const apiUrl = import.meta.env.VITE_API_URL || '';
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/addresses/${addr.id}`, {
+      await fetch(`${apiUrl}/api/addresses/${addr.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ ...addr, is_default: true })
