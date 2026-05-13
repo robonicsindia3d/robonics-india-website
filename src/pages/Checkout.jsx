@@ -139,14 +139,9 @@ const Checkout = () => {
     }
   }, [formData.billingPincode, formData.shippingPincode, formData.sameAsBilling, cartItems, paymentMethod]);
   
-  // Update coupon discount to be capped at (subtotal + shippingCost) instead of just subtotal
-  useEffect(() => {
-    if (discount > (subtotal + shippingCost)) {
-      setDiscount(subtotal + shippingCost);
-    }
-  }, [shippingCost, subtotal]);
-
-  const total = Math.max(0, subtotal + shippingCost - discount);
+  // Instant Free Shipping Override
+  const displayShipping = subtotal >= 1500 ? 0 : shippingCost;
+  const total = Math.max(0, subtotal + displayShipping - discount);
 
   const nextStep = async (e) => {
     e.preventDefault();
@@ -457,19 +452,19 @@ const Checkout = () => {
                   {couponStatus && <p style={{ fontSize: '0.85rem', marginTop: '0.5rem', color: discount > 0 ? '#10b981' : '#ef4444', fontWeight: 600 }}>{couponStatus}</p>}
                 </div>
 
-                <div className="summary-totals" style={{ marginTop: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
-                  <div className="summary-item-row" style={{ fontSize: '0.95rem' }}><span>Subtotal</span><span>₹{subtotal}</span></div>
-                  <div className="summary-item-row" style={{ fontSize: '0.95rem' }}>
-                    <span>Shipping</span>
-                    <span style={{ color: isFreeShipping ? '#10b981' : 'inherit', fontWeight: isFreeShipping ? 700 : 'inherit' }}>
-                      {isCalculatingShipping ? '...' : (isFreeShipping ? 'FREE' : `₹${shippingCost}`)}
-                    </span>
+                  <div className="summary-totals" style={{ marginTop: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
+                    <div className="summary-item-row" style={{ fontSize: '0.95rem' }}><span>Subtotal</span><span>₹{subtotal}</span></div>
+                    <div className="summary-item-row" style={{ fontSize: '0.95rem' }}>
+                      <span>Shipping</span>
+                      <span style={{ color: subtotal >= 1500 ? '#10b981' : 'inherit', fontWeight: subtotal >= 1500 ? 700 : 'inherit' }}>
+                        {subtotal >= 1500 ? 'FREE' : (isCalculatingShipping ? '...' : `₹${shippingCost}`)}
+                      </span>
+                    </div>
+                    {discount > 0 && <div className="summary-item-row" style={{ color: '#10b981', fontWeight: 600 }}><span>Discount Applied</span><span>-₹{discount.toFixed(0)}</span></div>}
+                    <div className="summary-item-row total-row" style={{ fontSize: '1.4rem', borderTop: '2px solid #e2e8f0', paddingTop: '1rem', marginTop: '1rem', color: 'var(--text-primary)' }}>
+                      <span>Total</span><span>₹{total.toFixed(0)}</span>
+                    </div>
                   </div>
-                  {discount > 0 && <div className="summary-item-row" style={{ color: '#10b981', fontWeight: 600 }}><span>Discount Applied</span><span>-₹{discount.toFixed(0)}</span></div>}
-                  <div className="summary-item-row total-row" style={{ fontSize: '1.4rem', borderTop: '2px solid #e2e8f0', paddingTop: '1rem', marginTop: '1rem', color: 'var(--text-primary)' }}>
-                    <span>Total</span><span>₹{total.toFixed(0)}</span>
-                  </div>
-                </div>
                 <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
                   <ShieldCheck size={16} /> 100% Secure Checkout
                 </div>
