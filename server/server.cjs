@@ -295,6 +295,7 @@ app.post('/api/place-cod-order', optionalAuth, async (req, res) => {
     decrementStock(JSON.stringify(items));
     res.json({ success: true, orderId });
   } catch (error) {
+    console.error('❌ Error placing COD order:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
@@ -375,6 +376,7 @@ app.post('/api/coupons/validate', async (req, res) => {
     if (rows.length === 0) return res.status(404).json({ success: false, message: 'Invalid coupon' });
     res.json({ success: true, coupon: rows[0] });
   } catch (err) {
+    console.error('❌ Error validating coupon:', err);
     res.status(500).json({ success: false, message: 'Database error' });
   }
 });
