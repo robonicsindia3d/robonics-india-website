@@ -43,8 +43,9 @@ const Checkout = () => {
   const [saveAddress, setSaveAddress] = useState(false);
 
   const subtotal = getCartTotal();
-  const [shippingCost, setShippingCost] = useState(99);
+  const [shippingCost, setShippingCost] = useState(0);
   const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
+  const [hasCalculatedShipping, setHasCalculatedShipping] = useState(false);
 
   // Fetch saved addresses
   useEffect(() => {
@@ -125,6 +126,7 @@ const Checkout = () => {
           if (data.success) {
             setShippingCost(data.shippingCost);
             setIsFreeShipping(data.isFree || false);
+            setHasCalculatedShipping(true);
           }
           else setShippingCost(80);
         } catch (err) {
@@ -457,7 +459,9 @@ const Checkout = () => {
                     <div className="summary-item-row" style={{ fontSize: '0.95rem' }}>
                       <span>Shipping</span>
                       <span style={{ color: subtotal >= 1500 ? '#10b981' : 'inherit', fontWeight: subtotal >= 1500 ? 700 : 'inherit' }}>
-                        {subtotal >= 1500 ? 'FREE' : (isCalculatingShipping ? '...' : `₹${shippingCost}`)}
+                        {subtotal >= 1500 ? 'FREE' : 
+                         isCalculatingShipping ? '...' : 
+                         hasCalculatedShipping ? `₹${shippingCost}` : 'Enter Pincode'}
                       </span>
                     </div>
                     {discount > 0 && <div className="summary-item-row" style={{ color: '#10b981', fontWeight: 600 }}><span>Discount Applied</span><span>-₹{discount.toFixed(0)}</span></div>}
