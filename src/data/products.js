@@ -244,14 +244,14 @@ export const productsData = [
     "category": "Stranger Things",
     "price": 399,
     "scale": 8,
-    "image": "/Images/11. Stranger Things/Demogorgon/Photo/Gemini_Generated_Image_5raq0d5raq0d5raq.png",
+    "image": "/Images/11. Stranger Things/Demogorgon/Photo/IMG_9518.JPG",
     "images": [
-      "/Images/11. Stranger Things/Demogorgon/Photo/Gemini_Generated_Image_5raq0d5raq0d5raq.png",
       "/Images/11. Stranger Things/Demogorgon/Photo/IMG_9518.JPG",
       "/Images/11. Stranger Things/Demogorgon/Photo/IMG_9525.JPG",
       "/Images/11. Stranger Things/Demogorgon/Photo/IMG_9532.JPG",
       "/Images/11. Stranger Things/Demogorgon/Photo/IMG_9539.JPG",
-      "/Images/11. Stranger Things/Demogorgon/Photo/IMG_9546.JPG"
+      "/Images/11. Stranger Things/Demogorgon/Photo/IMG_9546.JPG",
+      "/Images/11. Stranger Things/Demogorgon/Photo/Gemini_Generated_Image_5raq0d5raq0d5raq.png"
     ],
     "stock": 10
   },

@@ -32,7 +32,7 @@ categories.forEach(catFolder => {
       const imgs = fs.readdirSync(subPath).filter(f => /\.(jpg|jpeg|png|webp|gif)$/i.test(f));
       
       imgs.forEach(img => {
-        // Create relative path for frontend
+        // Create relative path for frontend - STRICTOR CHECK
         const relPath = `/Images/${catFolder}/${charFolder}/${sub}/${img}`;
         allImages.push(relPath);
       });
@@ -43,8 +43,15 @@ categories.forEach(catFolder => {
       allImages.sort((a, b) => {
         const aName = path.basename(a).toLowerCase();
         const bName = path.basename(b).toLowerCase();
-        if (aName === '1.jpg' || aName === '1.png') return -1;
-        if (bName === '1.jpg' || bName === '1.png') return 1;
+        
+        // Priority 1: "1.jpg" or "1.png"
+        if (aName.startsWith('1.') && !bName.startsWith('1.')) return -1;
+        if (bName.startsWith('1.') && !aName.startsWith('1.')) return 1;
+        
+        // Priority 2: Files that don't look like long random strings
+        if (aName.length < 20 && bName.length >= 20) return -1;
+        if (bName.length < 20 && aName.length >= 20) return 1;
+
         return aName.localeCompare(bName);
       });
 
@@ -52,10 +59,10 @@ categories.forEach(catFolder => {
         id: idCounter++,
         name: charFolder,
         category: catName,
-        price: 399, // Default price
-        scale: 8,   // Default scale
+        price: 399,
+        scale: 8,
         image: allImages[0],
-        images: allImages,
+        images: [...new Set(allImages)], // Ensure no duplicates
         stock: 10
       });
     }
