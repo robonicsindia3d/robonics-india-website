@@ -18,7 +18,7 @@ server/.env
 server/node_modules
 server/orders.db
 uploads/
-# public/Images/ (Removed to allow catalog upload)
+public/Images/
 
 # Editor directories and files
 .vscode/*
