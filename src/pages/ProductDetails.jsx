@@ -71,18 +71,18 @@ const ProductDetails = () => {
           {/* Left Column: Image Gallery */}
           <div className="product-gallery">
             <div className="main-image-container">
-              <img src={mainImage} alt={product.name} className="main-image" />
+              <img src={encodeURI(mainImage)} alt={product.name} className="main-image" />
             </div>
             
             {product.images && product.images.length > 1 && (
               <div className="thumbnail-list">
-                {product.images.slice(0, 5).map((img, idx) => (
+                {product.images.slice(0, 10).map((img, idx) => (
                   <button 
                     key={idx} 
                     className={`thumbnail-btn ${mainImage === img ? 'active' : ''}`}
                     onClick={() => setMainImage(img)}
                   >
-                    <img src={img} alt={`${product.name} view ${idx + 1}`} />
+                    <img src={encodeURI(img)} alt={`${product.name} view ${idx + 1}`} />
                   </button>
                 ))}
               </div>
