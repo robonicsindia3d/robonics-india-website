@@ -107,11 +107,11 @@ const Cart = () => {
             </div>
             <div className="summary-row">
               <span>Shipping</span>
-              <span>₹{shipping}</span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Calculated at checkout</span>
             </div>
             <div className="summary-row total-row">
               <span>Total</span>
-              <span>₹{total}</span>
+              <span>₹{subtotal}</span>
             </div>
             
             <button className="btn-primary checkout-btn" onClick={() => navigate('/checkout')}>

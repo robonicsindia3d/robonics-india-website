@@ -162,24 +162,6 @@ const Dashboard = () => {
           </button>
         </div>
 
-        {/* Quick Order Status for Ease of Use */}
-        {!isLoading && orders.length > 0 && (
-          <div style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)', padding: '1.5rem', borderRadius: 'var(--radius-lg)', marginBottom: '2rem', border: '1px solid #bfdbfe', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-            <div>
-              <h3 style={{ fontSize: '0.9rem', color: '#1e40af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>Latest Order Status</h3>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <span style={{ fontWeight: 700, fontSize: '1.1rem' }}>#{orders[0].id.slice(0, 8)}...</span>
-                <span className={`order-status status-${orders[0].status.toLowerCase()}`} style={{ fontSize: '0.75rem' }}>
-                  {orders[0].status.toUpperCase()}
-                </span>
-              </div>
-            </div>
-            <button className="btn-primary" onClick={() => setActiveTab('orders')} style={{ width: 'auto', padding: '0.6rem 1.25rem', fontSize: '0.85rem' }}>
-              View All Orders
-            </button>
-          </div>
-        )}
-
         {/* Tabs */}
         <div className="dashboard-tabs">
           <button className={`dashboard-tab ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>
