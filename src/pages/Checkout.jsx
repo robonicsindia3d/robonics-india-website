@@ -143,7 +143,6 @@ const Checkout = () => {
         return;
       }
       
-      // Save address if checked
       if (saveAddress && token) {
         const apiUrl = import.meta.env.VITE_API_URL || '';
         try {
@@ -273,7 +272,7 @@ const Checkout = () => {
         <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '3rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: step >= 1 ? 'var(--primary-blue)' : 'var(--text-secondary)', fontWeight: 700 }}>
             <span style={{ width: '24px', height: '24px', borderRadius: '50%', background: step >= 1 ? 'var(--primary-blue)' : 'var(--border-color)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}>1</span>
-            Shipping
+            Address
           </div>
           <div style={{ width: '50px', height: '1px', background: 'var(--border-color)', alignSelf: 'center' }}></div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: step >= 2 ? 'var(--primary-blue)' : 'var(--text-secondary)', fontWeight: 700 }}>
@@ -299,17 +298,27 @@ const Checkout = () => {
                 </div>
 
                 <div className="form-group-section">
-                  <h2>Billing Address</h2>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <h2>Shipping Details</h2>
+                    <div style={{ padding: '0.5rem 1rem', background: '#f0f9ff', borderRadius: '999px', border: '1px solid #bae6fd', fontSize: '0.8rem', color: '#0369a1', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <MapPin size={14} /> Pincode based shipping
+                    </div>
+                  </div>
+
                   {savedAddresses.length > 0 && (
-                    <div style={{ marginBottom: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-                      {savedAddresses.map(addr => (
-                        <button key={addr.id} type="button" onClick={() => selectAddress(addr)} style={{ padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', border: `2px solid ${selectedAddressId === addr.id ? 'var(--primary-blue)' : 'var(--border-color)'}`, background: selectedAddressId === addr.id ? '#eff6ff' : 'white', cursor: 'pointer', textAlign: 'left', flex: '1 1 200px' }}>
-                          <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>{addr.label}: {addr.full_name}</div>
-                          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{addr.address_line1}, {addr.city}</div>
-                        </button>
-                      ))}
+                    <div style={{ marginBottom: '1.5rem' }}>
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.75rem', fontWeight: 600 }}>Use a saved address:</p>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+                        {savedAddresses.map(addr => (
+                          <button key={addr.id} type="button" onClick={() => selectAddress(addr)} style={{ padding: '1rem', borderRadius: 'var(--radius-md)', border: `2px solid ${selectedAddressId === addr.id ? 'var(--primary-blue)' : 'var(--border-color)'}`, background: selectedAddressId === addr.id ? '#eff6ff' : 'white', cursor: 'pointer', textAlign: 'left', flex: '1 1 200px', transition: 'all 0.2s' }}>
+                            <div style={{ fontWeight: 700, fontSize: '0.9rem', color: selectedAddressId === addr.id ? 'var(--primary-blue)' : 'inherit' }}>{addr.label}: {addr.full_name}</div>
+                            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>{addr.address_line1}, {addr.city}</div>
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   )}
+
                   <div className="checkout-input-group">
                     <input required type="text" name="billingAddress1" placeholder="Address (House No, Street, Area)" value={formData.billingAddress1} onChange={handleChange} />
                     <div className="checkout-input-row">
@@ -319,21 +328,23 @@ const Checkout = () => {
                     <input required type="text" name="billingPincode" placeholder="PIN Code (6 digits)" value={formData.billingPincode} onChange={handleChange} />
                   </div>
 
-                  {token && !selectedAddressId && (
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem', cursor: 'pointer', fontSize: '0.9rem' }}>
-                      <input type="checkbox" checked={saveAddress} onChange={(e) => setSaveAddress(e.target.checked)} style={{ width: 'auto' }} />
-                      Save this address for future use
-                    </label>
-                  )}
+                  <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    {token && !selectedAddressId && (
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: saveAddress ? '#f0fdf4' : '#f8fafc', border: `1px solid ${saveAddress ? '#bbf7d0' : 'var(--border-color)'}`, borderRadius: 'var(--radius-md)', cursor: 'pointer', transition: 'all 0.2s' }}>
+                        <input type="checkbox" checked={saveAddress} onChange={(e) => setSaveAddress(e.target.checked)} style={{ width: 'auto', transform: 'scale(1.2)' }} />
+                        <span style={{ fontSize: '0.95rem', fontWeight: 600 }}>Save this address to my account</span>
+                      </label>
+                    )}
 
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem', cursor: 'pointer', fontSize: '0.9rem' }}>
-                    <input type="checkbox" name="sameAsBilling" checked={formData.sameAsBilling} onChange={handleChange} style={{ width: 'auto' }} />
-                    Shipping address is same as billing
-                  </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: formData.sameAsBilling ? '#f0f9ff' : '#f8fafc', border: `1px solid ${formData.sameAsBilling ? '#bae6fd' : 'var(--border-color)'}`, borderRadius: 'var(--radius-md)', cursor: 'pointer', transition: 'all 0.2s' }}>
+                      <input type="checkbox" name="sameAsBilling" checked={formData.sameAsBilling} onChange={handleChange} style={{ width: 'auto', transform: 'scale(1.2)' }} />
+                      <span style={{ fontSize: '0.95rem', fontWeight: 600 }}>Shipping address is same as billing</span>
+                    </label>
+                  </div>
                 </div>
 
                 {!formData.sameAsBilling && (
-                  <div className="form-group-section animate-fade-in">
+                  <div className="form-group-section animate-fade-in" style={{ borderTop: '2px dashed var(--border-color)', paddingTop: '2rem', marginTop: '2rem' }}>
                     <h2>Shipping Address</h2>
                     <div className="checkout-input-group">
                       <input required type="text" name="shippingAddress1" placeholder="Address (House No, Street, Area)" value={formData.shippingAddress1} onChange={handleChange} />
@@ -346,79 +357,87 @@ const Checkout = () => {
                   </div>
                 )}
 
-                <button type="submit" className="btn-primary" style={{ marginTop: '2rem', width: '100%', padding: '1.25rem', fontSize: '1.1rem' }}>
-                  Continue to Payment <ArrowRight size={18} style={{ marginLeft: '0.5rem' }} />
+                <button type="submit" className="btn-primary" style={{ marginTop: '2.5rem', width: '100%', padding: '1.25rem', fontSize: '1.1rem', boxShadow: '0 4px 12px rgba(30, 64, 175, 0.2)' }}>
+                  Continue to Payment <ArrowRight size={20} style={{ marginLeft: '0.5rem' }} />
                 </button>
               </form>
             ) : (
               <div className="animate-fade-in">
-                <button onClick={prevStep} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', fontWeight: 600 }}>
-                  <ArrowLeft size={16} /> Back to Shipping
+                <button onClick={prevStep} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', fontWeight: 700 }}>
+                  <ArrowLeft size={16} /> Edit Address
                 </button>
 
                 <div className="form-group-section">
-                  <h2>Payment Method</h2>
+                  <h2>How would you like to pay?</h2>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.25rem', border: `1px solid ${paymentMethod === 'online' ? 'var(--primary-blue)' : 'var(--border-color)'}`, borderRadius: 'var(--radius-md)', cursor: 'pointer', background: paymentMethod === 'online' ? '#eff6ff' : 'white' }}>
-                      <input type="radio" name="payMethod" checked={paymentMethod === 'online'} onChange={() => setPaymentMethod('online')} />
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', padding: '1.5rem', border: `2px solid ${paymentMethod === 'online' ? 'var(--primary-blue)' : 'var(--border-color)'}`, borderRadius: 'var(--radius-lg)', cursor: 'pointer', background: paymentMethod === 'online' ? '#eff6ff' : 'white', transition: 'all 0.2s' }}>
+                      <input type="radio" name="payMethod" checked={paymentMethod === 'online'} onChange={() => setPaymentMethod('online')} style={{ transform: 'scale(1.3)' }} />
                       <div>
-                        <div style={{ fontWeight: 700 }}>Pay Online (UPI, Cards, Netbanking)</div>
-                        <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Secure payment via Razorpay</div>
+                        <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>Pay Online (UPI / Card / Netbanking)</div>
+                        <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Fastest and most secure way to pay</div>
                       </div>
                     </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.25rem', border: `1px solid ${paymentMethod === 'cod' ? 'var(--primary-blue)' : 'var(--border-color)'}`, borderRadius: 'var(--radius-md)', cursor: 'pointer', background: paymentMethod === 'cod' ? '#eff6ff' : 'white' }}>
-                      <input type="radio" name="payMethod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} />
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', padding: '1.5rem', border: `2px solid ${paymentMethod === 'cod' ? 'var(--primary-blue)' : 'var(--border-color)'}`, borderRadius: 'var(--radius-lg)', cursor: 'pointer', background: paymentMethod === 'cod' ? '#eff6ff' : 'white', transition: 'all 0.2s' }}>
+                      <input type="radio" name="payMethod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} style={{ transform: 'scale(1.3)' }} />
                       <div>
-                        <div style={{ fontWeight: 700 }}>Cash on Delivery</div>
-                        <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Pay ₹{total.toFixed(0)} at your doorstep</div>
+                        <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>Cash on Delivery (COD)</div>
+                        <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Pay at your doorstep on delivery</div>
                       </div>
                     </label>
                   </div>
                 </div>
 
                 <div className="form-group-section">
-                  <h2>Delivery Summary</h2>
-                  <div style={{ padding: '1.25rem', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                    <strong>{formData.firstName} {formData.lastName}</strong><br />
-                    {formData.billingAddress1}, {formData.billingCity}, {formData.billingState} - {formData.billingPincode}<br />
-                    Phone: {formData.phone}
+                  <h2>Order Summary</h2>
+                  <div style={{ padding: '1.25rem', background: '#f8fafc', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                      <MapPin size={20} style={{ color: 'var(--primary-blue)' }} />
+                      <div style={{ fontSize: '0.95rem', lineHeight: 1.5 }}>
+                        <strong>{formData.firstName} {formData.lastName}</strong><br />
+                        {formData.billingAddress1}, {formData.billingCity}, {formData.billingState} - {formData.billingPincode}<br />
+                        <span style={{ color: 'var(--text-secondary)' }}>Phone: {formData.phone}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <button onClick={handlePayment} className="btn-primary" disabled={isProcessing} style={{ width: '100%', padding: '1.25rem', marginTop: '1rem', fontSize: '1.1rem' }}>
-                  {isProcessing ? 'Processing...' : (paymentMethod === 'cod' ? 'Confirm COD Order' : `Pay ₹${total.toFixed(0)} Securely`)}
+                <button onClick={handlePayment} className="btn-primary" disabled={isProcessing} style={{ width: '100%', padding: '1.5rem', marginTop: '1rem', fontSize: '1.2rem', fontWeight: 800, boxShadow: '0 10px 15px -3px rgba(30, 64, 175, 0.3)' }}>
+                  {isProcessing ? 'Verifying...' : (paymentMethod === 'cod' ? 'Confirm Order' : `Pay ₹${total.toFixed(0)} Now`)}
                 </button>
               </div>
             )}
           </div>
 
           <div className="checkout-sidebar-col">
-            <div className="order-summary-box">
-              <h3>Order Summary</h3>
+            <div className="order-summary-box" style={{ position: 'sticky', top: '7rem' }}>
+              <h3>Items in Bag</h3>
               <div className="summary-items">
                 {cartItems.map(item => (
-                  <div key={item.cartItemId} className="summary-item-row">
-                    <span>{item.quantity}x {item.name}</span>
-                    <span>₹{item.price * item.quantity}</span>
+                  <div key={item.cartItemId} className="summary-item-row" style={{ alignItems: 'flex-start' }}>
+                    <span style={{ fontWeight: 600 }}>{item.quantity}x {item.name}</span>
+                    <span style={{ fontWeight: 700 }}>₹{item.price * item.quantity}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="coupon-section" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1rem', marginTop: '1rem' }}>
+              <div className="coupon-section" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem', marginTop: '1.5rem' }}>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <input type="text" placeholder="Coupon Code" value={couponCode} onChange={(e) => setCouponCode(e.target.value.toUpperCase())} style={{ flex: 1, padding: '0.6rem', border: '1px solid var(--border-color)', borderRadius: '4px' }} />
-                  <button onClick={handleApplyCoupon} className="btn-primary" style={{ width: 'auto', padding: '0.6rem 1rem' }}>Apply</button>
+                  <input type="text" placeholder="Promo Code" value={couponCode} onChange={(e) => setCouponCode(e.target.value.toUpperCase())} style={{ flex: 1, padding: '0.75rem', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }} />
+                  <button onClick={handleApplyCoupon} className="btn-primary" style={{ width: 'auto', padding: '0.75rem 1rem' }}>Apply</button>
                 </div>
-                {couponStatus && <p style={{ fontSize: '0.8rem', marginTop: '0.4rem', color: discount > 0 ? 'green' : 'red' }}>{couponStatus}</p>}
+                {couponStatus && <p style={{ fontSize: '0.85rem', marginTop: '0.5rem', color: discount > 0 ? '#10b981' : '#ef4444', fontWeight: 600 }}>{couponStatus}</p>}
               </div>
 
-              <div className="summary-totals" style={{ marginTop: '1.5rem' }}>
-                <div className="summary-item-row"><span>Subtotal</span><span>₹{subtotal}</span></div>
-                <div className="summary-item-row"><span>Shipping</span><span>{isCalculatingShipping ? '...' : `₹${shippingCost}`}</span></div>
-                {discount > 0 && <div className="summary-item-row" style={{ color: 'green' }}><span>Discount</span><span>-₹{discount.toFixed(0)}</span></div>}
-                <div className="summary-item-row total-row" style={{ fontSize: '1.25rem', borderTop: '2px solid var(--border-color)', paddingTop: '0.75rem', marginTop: '0.75rem' }}>
-                  <span>Total</span><span>₹{total.toFixed(0)}</span>
+              <div className="summary-totals" style={{ marginTop: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
+                <div className="summary-item-row" style={{ fontSize: '0.95rem' }}><span>Subtotal</span><span>₹{subtotal}</span></div>
+                <div className="summary-item-row" style={{ fontSize: '0.95rem' }}><span>Shipping Cost</span><span>{isCalculatingShipping ? 'Calculating...' : `₹${shippingCost}`}</span></div>
+                {discount > 0 && <div className="summary-item-row" style={{ color: '#10b981', fontWeight: 600 }}><span>Discount Applied</span><span>-₹{discount.toFixed(0)}</span></div>}
+                <div className="summary-item-row total-row" style={{ fontSize: '1.4rem', borderTop: '2px solid #e2e8f0', paddingTop: '1rem', marginTop: '1rem', color: 'var(--text-primary)' }}>
+                  <span>To Pay</span><span>₹{total.toFixed(0)}</span>
                 </div>
+              </div>
+              <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                <ShieldCheck size={16} /> 100% Secure Checkout
               </div>
             </div>
           </div>
