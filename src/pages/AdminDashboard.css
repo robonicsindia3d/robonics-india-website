@@ -1,0 +1,22 @@
+.admin-dashboard {
+  /* Inherits standard page transitions and container properties */
+}
+
+/* Tab button outline style for inactive tabs */
+.admin-tabs .btn-primary.outline {
+  background-color: transparent;
+  color: var(--primary-blue);
+  border: 1px solid var(--primary-blue);
+}
+
+.admin-tabs .btn-primary.outline:hover {
+  background-color: var(--primary-blue);
+  color: white;
+}
+
+/* Ensure table looks nice on mobile */
+@media (max-width: 768px) {
+  .admin-content {
+    padding: 1rem !important;
+  }
+}

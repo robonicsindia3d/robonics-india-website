@@ -1,0 +1,88 @@
+.shop-layout {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+.shop-sidebar {
+  background-color: white;
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  position: sticky;
+  top: 100px;
+}
+
+.shop-sidebar h3 {
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--bg-secondary);
+  padding-bottom: 0.5rem;
+}
+
+.category-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.category-btn {
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: var(--transition);
+  font-size: 1rem;
+}
+
+.category-btn:hover {
+  background-color: var(--bg-secondary);
+  color: var(--primary-blue);
+}
+
+.category-btn.active {
+  background-color: var(--accent-blue);
+  color: var(--primary-blue);
+  font-weight: 700;
+}
+
+.shop-main {
+  min-width: 0;
+}
+
+/* Override the internal container padding from ProductGrid if used inside Shop Layout */
+.shop-main .product-section {
+  padding: 0;
+}
+.shop-main .container {
+  padding: 0;
+}
+.shop-main .section-header {
+  display: none; /* Hide header if it's placed inside shop */
+}
+
+@media (max-width: 968px) {
+  .shop-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .shop-sidebar {
+    position: static;
+  }
+  
+  .category-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .category-btn {
+    width: auto;
+  }
+}
