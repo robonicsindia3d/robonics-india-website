@@ -8,7 +8,8 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/products`)
+    const apiUrl = import.meta.env.VITE_API_URL || '';
+    fetch(`${apiUrl}/api/products`)
       .then(res => res.json())
       .then(data => {
         if (data.success) setProductsData(data.products);

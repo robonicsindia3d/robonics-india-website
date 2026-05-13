@@ -16,7 +16,8 @@ const ProductDetails = () => {
   const [selectedSize, setSelectedSize] = useState('10cm');
   
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}`)
+    const apiUrl = import.meta.env.VITE_API_URL || '';
+    fetch(`${apiUrl}/api/products/${id}`)
       .then(res => res.json())
       .then(data => {
         if (data.success) {
