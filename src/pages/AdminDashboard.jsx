@@ -449,7 +449,7 @@ const AdminDashboard = () => {
                           {products.map(product => (
                             <tr key={product.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                               <td style={{ padding: '1rem' }}>
-                                <img src={product.image} alt={product.name} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} onError={(e) => e.target.src='/Group 1.png'} />
+                                <img src={encodeURI(product.image)} alt={product.name} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} onError={(e) => e.target.src='/Group 1.png'} />
                               </td>
                               <td style={{ padding: '1rem', fontWeight: 'bold' }}>{product.name}</td>
                               <td style={{ padding: '1rem' }}>{product.category}</td>

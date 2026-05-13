@@ -33,11 +33,13 @@ const ProductCard = ({ product }) => {
         )}
         <Link to={`/product/${product.id}`}>
           <img 
-            src={product.image} 
+            src={encodeURI(product.image)} 
             alt={product.name} 
             className="product-image"
             onError={(e) => {
-              e.target.src = "https://images.unsplash.com/photo-1608889175123-8ee362201f81?q=80&w=400&auto=format&fit=crop";
+              // Try removing the leading slash if it fails, or fallback to a neutral placeholder
+              e.target.onerror = null; 
+              e.target.src = "https://via.placeholder.com/400x400?text=RobonicsIndia+3D";
             }}
           />
         </Link>
