@@ -300,6 +300,16 @@ app.post('/api/place-cod-order', optionalAuth, async (req, res) => {
   }
 });
 
+app.put('/api/admin/orders/:id/status', authenticateAdmin, async (req, res) => {
+  const { status } = req.body;
+  try {
+    await pool.query('UPDATE orders SET status = $1 WHERE id = $2', [status, req.params.id]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 app.put('/api/admin/products/:id/stock', authenticateAdmin, async (req, res) => {
   const { stock } = req.body;
   try {
@@ -312,7 +322,11 @@ app.put('/api/admin/products/:id/stock', authenticateAdmin, async (req, res) => 
 
 app.get('/api/orders/me', authenticateToken, async (req, res) => {
   try {
-    const { rows } = await pool.query('SELECT * FROM orders WHERE user_id = $1 ORDER BY created_at DESC', [req.user.id]);
+    // Linked by user_id OR email to catch guest orders after account creation
+    const { rows } = await pool.query(
+      'SELECT * FROM orders WHERE user_id = $1 OR customer_email = $2 ORDER BY created_at DESC', 
+      [req.user.id, req.user.email]
+    );
     res.json({ success: true, orders: rows });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Database error' });
