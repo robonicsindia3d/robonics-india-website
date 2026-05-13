@@ -115,6 +115,20 @@ const AdminDashboard = () => {
     }
   };
 
+  const deleteOrder = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this order PERMANENTLY?')) return;
+    const apiUrl = import.meta.env.VITE_API_URL || '';
+    try {
+      await fetch(`${apiUrl}/api/admin/orders/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      fetchData();
+    } catch (e) {
+      alert("Failed to delete order");
+    }
+  };
+
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -317,6 +331,14 @@ const AdminDashboard = () => {
                                 </button>
                               );
                             })}
+                            <div style={{ marginLeft: 'auto' }}>
+                              <button 
+                                onClick={() => deleteOrder(order.id)}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', fontSize: '0.8rem', fontWeight: 600, padding: '0.5rem' }}
+                              >
+                                Delete Order
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>

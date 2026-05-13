@@ -339,6 +339,15 @@ app.put('/api/admin/orders/:id/status', authenticateAdmin, async (req, res) => {
   }
 });
 
+app.delete('/api/admin/orders/:id', authenticateAdmin, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM orders WHERE id = $1', [req.params.id]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 app.put('/api/admin/products/:id/stock', authenticateAdmin, async (req, res) => {
   const { stock } = req.body;
   try {
