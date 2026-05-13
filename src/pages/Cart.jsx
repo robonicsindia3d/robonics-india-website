@@ -44,7 +44,29 @@ const Cart = () => {
   return (
     <div className="page-transition animate-fade-in cart-page" style={{ paddingTop: '8rem', paddingBottom: '6rem', minHeight: '60vh' }}>
       <div className="container">
-        <h1 style={{ marginBottom: '3rem' }}>Your Shopping Cart</h1>
+        <h1 style={{ marginBottom: '1rem' }}>Your Shopping Cart</h1>
+        
+        {/* Free Shipping Promotion */}
+        <div style={{ 
+          background: subtotal >= 1500 ? 'linear-gradient(90deg, #dcfce7, #f0fdf4)' : 'linear-gradient(90deg, #eff6ff, #f8fafc)',
+          padding: '1rem', 
+          borderRadius: 'var(--radius-md)', 
+          marginBottom: '2rem',
+          border: `1px solid ${subtotal >= 1500 ? '#86efac' : '#bfdbfe'}`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.75rem',
+          fontSize: '0.9rem',
+          fontWeight: 600,
+          color: subtotal >= 1500 ? '#166534' : '#1e40af'
+        }}>
+          {subtotal >= 1500 ? (
+            <>🎉 You've unlocked <strong>FREE SHIPPING!</strong></>
+          ) : (
+            <>🚚 Add ₹{1500 - subtotal} more to get <strong>FREE SHIPPING!</strong></>
+          )}
+        </div>
         
         <div className="cart-layout">
           <div className="cart-items">

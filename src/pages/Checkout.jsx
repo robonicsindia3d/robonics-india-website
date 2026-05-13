@@ -105,6 +105,8 @@ const Checkout = () => {
     }
   };
 
+  const [isFreeShipping, setIsFreeShipping] = useState(false);
+
   // Dynamic Shipping Calculation
   useEffect(() => {
     const pincode = formData.sameAsBilling ? formData.billingPincode : formData.shippingPincode;
@@ -120,10 +122,14 @@ const Checkout = () => {
             body: JSON.stringify({ pincode, items: cartItems, paymentMethod })
           });
           const data = await res.json();
-          if (data.success) setShippingCost(data.shippingCost);
-          else setShippingCost(150);
+          if (data.success) {
+            setShippingCost(data.shippingCost);
+            setIsFreeShipping(data.isFree || false);
+          }
+          else setShippingCost(80);
         } catch (err) {
           console.error("Shipping calc failed", err);
+          setShippingCost(80);
         } finally {
           setIsCalculatingShipping(false);
         }
@@ -133,7 +139,14 @@ const Checkout = () => {
     }
   }, [formData.billingPincode, formData.shippingPincode, formData.sameAsBilling, cartItems, paymentMethod]);
   
-  const total = subtotal + shippingCost - discount;
+  // Update coupon discount to be capped at (subtotal + shippingCost) instead of just subtotal
+  useEffect(() => {
+    if (discount > (subtotal + shippingCost)) {
+      setDiscount(subtotal + shippingCost);
+    }
+  }, [shippingCost, subtotal]);
+
+  const total = Math.max(0, subtotal + shippingCost - discount);
 
   const nextStep = async (e) => {
     e.preventDefault();
@@ -409,36 +422,57 @@ const Checkout = () => {
           </div>
 
           <div className="checkout-sidebar-col">
-            <div className="order-summary-box" style={{ position: 'sticky', top: '7rem' }}>
-              <h3>Items in Bag</h3>
-              <div className="summary-items">
-                {cartItems.map(item => (
-                  <div key={item.cartItemId} className="summary-item-row" style={{ alignItems: 'flex-start' }}>
-                    <span style={{ fontWeight: 600 }}>{item.quantity}x {item.name}</span>
-                    <span style={{ fontWeight: 700 }}>₹{item.price * item.quantity}</span>
+              <div className="order-summary-box" style={{ position: 'sticky', top: '7rem' }}>
+                <h3>Order Summary</h3>
+                
+                {/* Free Shipping Promotion */}
+                <div style={{ 
+                  background: subtotal >= 1500 ? '#f0fdf4' : '#eff6ff',
+                  padding: '0.75rem', 
+                  borderRadius: 'var(--radius-md)', 
+                  marginBottom: '1rem',
+                  border: `1px solid ${subtotal >= 1500 ? '#bbf7d0' : '#bfdbfe'}`,
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  color: subtotal >= 1500 ? '#166534' : '#1e40af',
+                  textAlign: 'center'
+                }}>
+                  {subtotal >= 1500 ? '🎉 Free Shipping Unlocked!' : `🚚 Add ₹${1500 - subtotal} more for FREE Shipping!`}
+                </div>
+
+                <div className="summary-items">
+                  {cartItems.map(item => (
+                    <div key={item.cartItemId} className="summary-item-row" style={{ alignItems: 'flex-start' }}>
+                      <span style={{ fontWeight: 600 }}>{item.quantity}x {item.name}</span>
+                      <span style={{ fontWeight: 700 }}>₹{item.price * item.quantity}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="coupon-section" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem', marginTop: '1.5rem' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <input type="text" placeholder="Promo Code" value={couponCode} onChange={(e) => setCouponCode(e.target.value.toUpperCase())} style={{ flex: 1, padding: '0.75rem', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }} />
+                    <button onClick={handleApplyCoupon} className="btn-primary" style={{ width: 'auto', padding: '0.75rem 1rem' }}>Apply</button>
                   </div>
-                ))}
-              </div>
-
-              <div className="coupon-section" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem', marginTop: '1.5rem' }}>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <input type="text" placeholder="Promo Code" value={couponCode} onChange={(e) => setCouponCode(e.target.value.toUpperCase())} style={{ flex: 1, padding: '0.75rem', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }} />
-                  <button onClick={handleApplyCoupon} className="btn-primary" style={{ width: 'auto', padding: '0.75rem 1rem' }}>Apply</button>
+                  {couponStatus && <p style={{ fontSize: '0.85rem', marginTop: '0.5rem', color: discount > 0 ? '#10b981' : '#ef4444', fontWeight: 600 }}>{couponStatus}</p>}
                 </div>
-                {couponStatus && <p style={{ fontSize: '0.85rem', marginTop: '0.5rem', color: discount > 0 ? '#10b981' : '#ef4444', fontWeight: 600 }}>{couponStatus}</p>}
-              </div>
 
-              <div className="summary-totals" style={{ marginTop: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
-                <div className="summary-item-row" style={{ fontSize: '0.95rem' }}><span>Subtotal</span><span>₹{subtotal}</span></div>
-                <div className="summary-item-row" style={{ fontSize: '0.95rem' }}><span>Shipping Cost</span><span>{isCalculatingShipping ? 'Calculating...' : `₹${shippingCost}`}</span></div>
-                {discount > 0 && <div className="summary-item-row" style={{ color: '#10b981', fontWeight: 600 }}><span>Discount Applied</span><span>-₹{discount.toFixed(0)}</span></div>}
-                <div className="summary-item-row total-row" style={{ fontSize: '1.4rem', borderTop: '2px solid #e2e8f0', paddingTop: '1rem', marginTop: '1rem', color: 'var(--text-primary)' }}>
-                  <span>To Pay</span><span>₹{total.toFixed(0)}</span>
+                <div className="summary-totals" style={{ marginTop: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
+                  <div className="summary-item-row" style={{ fontSize: '0.95rem' }}><span>Subtotal</span><span>₹{subtotal}</span></div>
+                  <div className="summary-item-row" style={{ fontSize: '0.95rem' }}>
+                    <span>Shipping</span>
+                    <span style={{ color: isFreeShipping ? '#10b981' : 'inherit', fontWeight: isFreeShipping ? 700 : 'inherit' }}>
+                      {isCalculatingShipping ? '...' : (isFreeShipping ? 'FREE' : `₹${shippingCost}`)}
+                    </span>
+                  </div>
+                  {discount > 0 && <div className="summary-item-row" style={{ color: '#10b981', fontWeight: 600 }}><span>Discount Applied</span><span>-₹{discount.toFixed(0)}</span></div>}
+                  <div className="summary-item-row total-row" style={{ fontSize: '1.4rem', borderTop: '2px solid #e2e8f0', paddingTop: '1rem', marginTop: '1rem', color: 'var(--text-primary)' }}>
+                    <span>Total</span><span>₹{total.toFixed(0)}</span>
+                  </div>
                 </div>
-              </div>
-              <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                <ShieldCheck size={16} /> 100% Secure Checkout
-              </div>
+                <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                  <ShieldCheck size={16} /> 100% Secure Checkout
+                </div>
             </div>
           </div>
         </div>

@@ -459,18 +459,29 @@ const getShiprocketToken = async () => {
 app.post('/api/calculate-shipping', async (req, res) => {
   try {
     const { pincode, items, paymentMethod } = req.body;
+    
+    // 1. Calculate Subtotal and Weight
     let totalWeight = 0;
+    let subtotal = 0;
     if (items) {
       items.forEach(item => {
         const size = item.size || '10cm';
         let itemWeight = size === '10cm' ? 0.2 : (size === '15cm' ? 0.5 : 1.0);
         totalWeight += (itemWeight * (item.quantity || 1));
+        subtotal += (item.price * item.quantity);
       });
     }
+
+    // 2. Free Shipping Rule (Orders above 1500)
+    if (subtotal >= 1500) {
+      return res.json({ success: true, shippingCost: 0, isFree: true });
+    }
+
     if (totalWeight === 0) totalWeight = 0.5;
 
+    // 3. Get Shiprocket Rates
     const token = await getShiprocketToken();
-    if (!token) return res.status(500).json({ success: false, message: 'Shipping service unavailable' });
+    if (!token) return res.status(500).json({ success: false, message: 'Shipping service unavailable', shippingCost: 80 });
 
     const isCod = paymentMethod === 'cod' ? 1 : 0;
     const url = `https://apiv2.shiprocket.in/v1/external/courier/serviceability/?pickup_postcode=201017&delivery_postcode=${pincode}&weight=${totalWeight}&cod=${isCod}`;
@@ -478,12 +489,17 @@ app.post('/api/calculate-shipping', async (req, res) => {
     const srData = await srRes.json();
     
     if (srData.status === 200 && srData.data && srData.data.available_courier_companies.length > 0) {
-      const lowestRate = Math.min(...srData.data.available_courier_companies.map(c => c.rate));
-      return res.json({ success: true, shippingCost: Math.ceil(lowestRate + 15) });
+      // Find the absolute cheapest rate
+      const lowestRate = Math.min(...srData.data.available_courier_companies.map(c => parseFloat(c.rate)));
+      // Add a small handling fee (₹5) and round up
+      return res.json({ success: true, shippingCost: Math.ceil(lowestRate + 5) });
     }
-    res.json({ success: false, message: 'Delivery not available to this pincode', fallbackCost: 100 });
+    
+    // Reasonable fallback for local/state shipping if API fails but pincode is likely valid
+    res.json({ success: true, shippingCost: 80, message: 'Using standard rate' });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Internal server error', fallbackCost: 100 });
+    console.error('❌ Shipping Calc Error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error', shippingCost: 80 });
   }
 });
 
