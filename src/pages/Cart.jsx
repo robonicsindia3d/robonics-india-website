@@ -73,7 +73,7 @@ const Cart = () => {
             {cartItems.map((item) => (
               <div key={item.cartItemId} className="cart-item">
                 <Link to={`/product/${item.id}`} style={{ display: 'flex', alignItems: 'center' }}>
-                  <img src={encodeURI(item.image)} alt={item.name} className="cart-item-image" />
+                  <img src={item.image.startsWith('http') ? item.image : encodeURI(item.image)} alt={item.name} className="cart-item-image" />
                 </Link>
                 <div className="cart-item-details">
                   <Link to={`/product/${item.id}`} style={{ textDecoration: 'none' }}>

@@ -72,10 +72,10 @@ const ProductDetails = () => {
           <div className="product-gallery">
             <div className="main-image-container">
               <img 
-                src={encodeURI(mainImage || product.image)} 
+                src={mainImage ? (mainImage.startsWith('http') ? mainImage : encodeURI(mainImage)) : (product.image?.startsWith('http') ? product.image : encodeURI(product.image || ''))} 
                 alt={product.name} 
                 className="main-image" 
-                onError={(e) => { e.target.src = '/Images/placeholder.jpg'; }}
+                onError={(e) => { e.target.src = 'https://via.placeholder.com/600x600?text=Image+Not+Found'; }}
               />
             </div>
             
@@ -88,7 +88,7 @@ const ProductDetails = () => {
                     className={`thumbnail-btn ${mainImage === img ? 'active' : ''}`}
                     onClick={() => setMainImage(img)}
                   >
-                    <img src={encodeURI(img)} alt={`${product.name} view ${idx + 1}`} />
+                    <img src={img.startsWith('http') ? img : encodeURI(img)} alt={`${product.name} view ${idx + 1}`} />
                   </button>
                 ))}
               </div>
