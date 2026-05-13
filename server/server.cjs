@@ -43,6 +43,15 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
+// Test Database Connection
+pool.connect((err, client, release) => {
+  if (err) {
+    return console.error('❌ Database connection error:', err.stack);
+  }
+  console.log('✅ Database connected successfully to Supabase');
+  release();
+});
+
 pool.on('error', (err) => {
   console.error('Unexpected error on idle client', err);
   process.exit(-1);
