@@ -297,7 +297,11 @@ app.post('/api/create-order', optionalAuth, async (req, res) => {
   try {
     const { amount, customerName, customerEmail, customerPhone, shippingAddress, billingAddress, items } = req.body;
     const userId = req.user ? req.user.id : null;
-    const order = await razorpay.orders.create({ amount: amount * 100, currency: 'INR', receipt: `rcpt_${Date.now()}` });
+    const order = await razorpay.orders.create({ 
+      amount: Math.round(amount * 100), 
+      currency: 'INR', 
+      receipt: `rcpt_${Date.now()}` 
+    });
     
     await pool.query(
       `INSERT INTO orders (id, user_id, customer_name, customer_email, customer_phone, shipping_address, billing_address, items, total_amount) 
