@@ -163,3 +163,24 @@
   border-color: var(--primary-blue);
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
 }
+@media (max-width: 768px) {
+  .product-overlay {
+    position: static;
+    opacity: 1;
+    transform: none;
+    background: none;
+    padding: 0 1.25rem 1.25rem;
+  }
+  
+  .add-to-cart-btn {
+    border-radius: var(--radius-md);
+    background-color: var(--primary-blue);
+    color: white;
+  }
+
+  .product-footer {
+    border-top: none;
+    padding-top: 0;
+    margin-bottom: 0.5rem;
+  }
+}
