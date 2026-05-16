@@ -243,15 +243,45 @@ app.post('/api/admin/upload', authenticateAdmin, upload.single('image'), async (
 });
 
 app.post('/api/admin/products', authenticateAdmin, async (req, res) => {
-  const { name, category, price, image, images, stock } = req.body;
+  const { name, category, price, image, images, stock, description, variants } = req.body;
   const imagesJson = JSON.stringify(images || [image]);
+  const variantsJson = variants ? JSON.stringify(variants) : JSON.stringify({ options: [] });
   try {
     const { rows } = await pool.query(
-      'INSERT INTO products (name, category, price, image, images_json, stock) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
-      [name, category, price, image, imagesJson, stock || 10]
+      'INSERT INTO products (name, category, price, image, images_json, stock, description, variants) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
+      [name, category, price, image, imagesJson, stock || 10, description || '', variantsJson]
     );
-    res.json({ success: true, product: { id: rows[0].id, name, category, price, image, images: images || [image], stock: stock || 10 } });
+    res.json({ success: true, product: { id: rows[0].id, name, category, price, image, images: images || [image], stock: stock || 10, description, variants } });
   } catch (error) {
+    console.error('❌ Error creating product:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+app.put('/api/admin/products/:id', authenticateAdmin, async (req, res) => {
+  const { name, category, price, image, images, stock, description, variants } = req.body;
+  const imagesJson = JSON.stringify(images || [image]);
+  const variantsJson = variants ? JSON.stringify(variants) : JSON.stringify({ options: [] });
+  try {
+    const { rows } = await pool.query(
+      'UPDATE products SET name = $1, category = $2, price = $3, image = $4, images_json = $5, stock = $6, description = $7, variants = $8 WHERE id = $9 RETURNING *',
+      [name, category, price, image, imagesJson, stock, description || '', variantsJson, req.params.id]
+    );
+    if (rows.length === 0) return res.status(404).json({ success: false, message: 'Product not found' });
+    res.json({ success: true, product: rows[0] });
+  } catch (error) {
+    console.error('❌ Error updating product:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+app.delete('/api/admin/products/:id', authenticateAdmin, async (req, res) => {
+  try {
+    const { rowCount } = await pool.query('DELETE FROM products WHERE id = $1', [req.params.id]);
+    if (rowCount === 0) return res.status(404).json({ success: false, message: 'Product not found' });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('❌ Error deleting product:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });

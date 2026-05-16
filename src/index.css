@@ -73,8 +73,9 @@ textarea {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: inherit;
-  font-size: 1rem;
+  font-size: 16px; /* iOS requires 16px minimum to prevent auto-zoom */
   transition: var(--transition);
+  -webkit-appearance: none; /* remove iOS default styles */
 }
 
 input:focus,
@@ -96,6 +97,7 @@ textarea:focus {
   background-color: var(--primary-blue);
   color: white;
   padding: 0.75rem 1.5rem;
+  min-height: 44px; /* iOS minimum touch target */
   border-radius: var(--radius-full);
   font-weight: 600;
   transition: var(--transition);
@@ -103,6 +105,7 @@ textarea:focus {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btn-primary:hover {
@@ -116,6 +119,7 @@ textarea:focus {
   color: var(--text-primary);
   border: 1px solid var(--border-color);
   padding: 0.75rem 1.5rem;
+  min-height: 44px; /* iOS minimum touch target */
   border-radius: var(--radius-full);
   font-weight: 600;
   transition: var(--transition);
@@ -123,6 +127,7 @@ textarea:focus {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btn-secondary:hover {
@@ -210,4 +215,17 @@ textarea:focus {
 @keyframes toastSlideOut {
   from { opacity: 1; transform: translateX(0) scale(1); }
   to { opacity: 0; transform: translateX(100%) scale(0.9); }
+}
+
+/* Mobile responsive globals */
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden;
+  }
+  
+  .container {
+    padding: 0 1rem;
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
 }

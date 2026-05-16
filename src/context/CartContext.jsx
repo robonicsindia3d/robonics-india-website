@@ -14,9 +14,9 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product, size, price) => {
+  const addToCart = (product, variantLabel, price) => {
     setCartItems(prev => {
-      const cartItemId = `${product.id}-${size}`;
+      const cartItemId = `${product.id}-${variantLabel}`;
       const existing = prev.find(item => item.cartItemId === cartItemId);
       
       if (existing) {
@@ -26,7 +26,7 @@ export const CartProvider = ({ children }) => {
             : item
         );
       }
-      return [...prev, { ...product, cartItemId, size, price, quantity: 1 }];
+      return [...prev, { ...product, cartItemId, variantLabel, price, quantity: 1 }];
     });
     
     showToast(`${product.name} added to cart!`, 'success');
@@ -45,15 +45,15 @@ export const CartProvider = ({ children }) => {
     setCartItems([]);
   };
 
-  const updateItemSize = (cartItemId, newSize, newPrice) => {
+  const updateItemVariant = (cartItemId, newVariantLabel, newPrice) => {
     setCartItems(prev => {
       const itemToUpdate = prev.find(item => item.cartItemId === cartItemId);
-      if (!itemToUpdate || itemToUpdate.size === newSize) return prev;
+      if (!itemToUpdate || itemToUpdate.variantLabel === newVariantLabel) return prev;
       
-      const newCartItemId = `${itemToUpdate.id}-${newSize}`;
-      const existingSameSize = prev.find(item => item.cartItemId === newCartItemId);
+      const newCartItemId = `${itemToUpdate.id}-${newVariantLabel}`;
+      const existingSameVariant = prev.find(item => item.cartItemId === newCartItemId);
 
-      if (existingSameSize) {
+      if (existingSameVariant) {
         return prev
           .filter(item => item.cartItemId !== cartItemId)
           .map(item => 
@@ -64,7 +64,7 @@ export const CartProvider = ({ children }) => {
       } else {
         return prev.map(item => 
           item.cartItemId === cartItemId 
-            ? { ...item, size: newSize, price: newPrice, cartItemId: newCartItemId } 
+            ? { ...item, variantLabel: newVariantLabel, price: newPrice, cartItemId: newCartItemId } 
             : item
         );
       }
@@ -76,7 +76,7 @@ export const CartProvider = ({ children }) => {
   };
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, updateItemSize, clearCart, getCartTotal }}>
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, updateItemVariant, clearCart, getCartTotal }}>
       {children}
     </CartContext.Provider>
   );

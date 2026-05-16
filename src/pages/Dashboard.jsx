@@ -201,7 +201,7 @@ const Dashboard = () => {
                       <div className="order-items-preview">
                         {JSON.parse(order.items).map((item, idx) => (
                           <div key={idx} className="order-item-mini">
-                            {item.quantity}x {item.name} ({item.size})
+                            {item.quantity}x {item.name} ({item.variantLabel || 'Standard'})
                           </div>
                         ))}
                       </div>

@@ -144,3 +144,13 @@
     position: static;
   }
 }
+
+@media (max-width: 600px) {
+  .checkout-input-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-group-section {
+    padding: 1.25rem;
+  }
+}

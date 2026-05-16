@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Heart } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
@@ -8,16 +8,40 @@ import './ProductCard.css';
 const ProductCard = ({ product }) => {
   const { addToCart } = useContext(CartContext);
   const { toggleWishlist, isInWishlist } = useContext(WishlistContext);
-  const [selectedSize, setSelectedSize] = useState('10cm');
+  const [selectedVariants, setSelectedVariants] = useState({});
   
-  const sizePricing = {
-    '10cm': product.price,
-    '15cm': 799,
-    '25cm': 1499
-  };
+  useEffect(() => {
+    // Set default variants (first choice of each option)
+    const defaults = {};
+    if (product.variants?.options) {
+      product.variants.options.forEach(opt => {
+        if (opt.choices && opt.choices.length > 0) {
+          defaults[opt.name] = opt.choices[0];
+        }
+      });
+    }
+    setSelectedVariants(defaults);
+  }, [product.variants]);
+
+  // Calculate price dynamically
+  let currentPrice = product.price || 0;
+  let variantLabelArray = [];
   
-  const currentPrice = sizePricing[selectedSize];
+  if (product.variants?.options) {
+    Object.keys(selectedVariants).forEach(optName => {
+      const choice = selectedVariants[optName];
+      if (choice) {
+        currentPrice += (choice.priceModifier || 0);
+        variantLabelArray.push(choice.label);
+      }
+    });
+  }
+  
+  const variantLabel = variantLabelArray.length > 0 ? variantLabelArray.join(' / ') : '';
   const isWishlisted = isInWishlist(product.id);
+
+  // For the quick card layout, we'll only show the choices of the FIRST option (e.g. Size)
+  const primaryOption = product.variants?.options?.[0];
 
   return (
     <div className="product-card animate-fade-in">
@@ -38,12 +62,12 @@ const ProductCard = ({ product }) => {
             className="product-image"
             onError={(e) => {
               e.target.onerror = null; 
-              e.target.src = "https://via.placeholder.com/400x400?text=RobonicsIndia+3D";
+              e.target.src = "/Group 1.png";
             }}
           />
         </Link>
         <div className="product-overlay">
-          <button className="btn-primary add-to-cart-btn" onClick={(e) => { e.preventDefault(); addToCart(product, selectedSize, currentPrice); }}>
+          <button className="btn-primary add-to-cart-btn" onClick={(e) => { e.preventDefault(); addToCart(product, variantLabel, currentPrice); }}>
             <ShoppingCart size={18} /> Add to Cart
           </button>
         </div>
@@ -54,20 +78,22 @@ const ProductCard = ({ product }) => {
           <h3 className="product-name" style={{ color: 'var(--text-primary)', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = 'var(--primary-blue)'} onMouseLeave={(e) => e.target.style.color = 'var(--text-primary)'}>{product.name}</h3>
         </Link>
         
-        <div className="card-size-selector">
-          {['10cm', '15cm', '25cm'].map(size => (
-            <button 
-              key={size}
-              className={`card-size-btn ${selectedSize === size ? 'active' : ''}`}
-              onClick={(e) => {
-                e.preventDefault();
-                setSelectedSize(size);
-              }}
-            >
-              {size}
-            </button>
-          ))}
-        </div>
+        {primaryOption && (
+          <div className="card-size-selector">
+            {primaryOption.choices.map(choice => (
+              <button 
+                key={choice.label}
+                className={`card-size-btn ${selectedVariants[primaryOption.name]?.label === choice.label ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setSelectedVariants(prev => ({ ...prev, [primaryOption.name]: choice }));
+                }}
+              >
+                {choice.label}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="product-footer">
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>

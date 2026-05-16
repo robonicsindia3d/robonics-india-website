@@ -5,18 +5,8 @@ import { CartContext } from '../context/CartContext';
 import './Cart.css';
 
 const Cart = () => {
-  const { cartItems, removeFromCart, updateQuantity, updateItemSize, getCartTotal } = useContext(CartContext);
+  const { cartItems, removeFromCart, updateQuantity, getCartTotal } = useContext(CartContext);
   const navigate = useNavigate();
-
-  const handleSizeChange = (cartItemId, productId, newSize) => {
-    const priceMapping = {
-      '10cm': 399,
-      '15cm': 799,
-      '25cm': 1499
-    };
-    const newPrice = priceMapping[newSize] || 399;
-    updateItemSize(cartItemId, newSize, newPrice);
-  };
 
   if (cartItems.length === 0) {
     return (
@@ -81,19 +71,10 @@ const Cart = () => {
                   </Link>
                   <p className="cart-item-category" style={{ marginBottom: '0.5rem' }}>{item.category}</p>
                   
-                  <div className="card-size-selector" style={{ maxWidth: '250px', marginBottom: '0.75rem' }}>
-                    {['10cm', '15cm', '25cm'].map(size => (
-                      <button 
-                        key={size}
-                        className={`card-size-btn ${item.size === size ? 'active' : ''}`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleSizeChange(item.cartItemId, item.id, size);
-                        }}
-                      >
-                        {size}
-                      </button>
-                    ))}
+                  <div style={{ marginBottom: '0.75rem' }}>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', background: 'var(--bg-secondary)', padding: '0.25rem 0.5rem', borderRadius: 'var(--radius-sm)', fontWeight: 600 }}>
+                      Variant: {item.variantLabel || 'Standard'}
+                    </span>
                   </div>
                   
                   <p className="cart-item-price">₹{item.price}</p>

@@ -13,16 +13,30 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [mainImage, setMainImage] = useState('');
-  const [selectedSize, setSelectedSize] = useState('10cm');
   
+  // selectedVariants: { "Size": "15cm", "Material": "Resin" }
+  const [selectedVariants, setSelectedVariants] = useState({});
+
   useEffect(() => {
     const apiUrl = import.meta.env.VITE_API_URL || '';
     fetch(`${apiUrl}/api/products/${id}`)
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          setProduct(data.product);
-          setMainImage(data.product.image);
+          const p = data.product;
+          setProduct(p);
+          setMainImage(p.image);
+          
+          // Set default variants (first choice of each option)
+          const defaults = {};
+          if (p.variants?.options) {
+            p.variants.options.forEach(opt => {
+              if (opt.choices && opt.choices.length > 0) {
+                defaults[opt.name] = opt.choices[0];
+              }
+            });
+          }
+          setSelectedVariants(defaults);
         }
         setLoading(false);
       })
@@ -32,13 +46,21 @@ const ProductDetails = () => {
       });
   }, [id]);
 
-  const sizePricing = {
-    '10cm': product ? product.price : 399,
-    '15cm': 799,
-    '25cm': 1499
-  };
+  // Calculate price dynamically
+  let currentPrice = product?.price || 0;
+  let variantLabelArray = [];
   
-  const currentPrice = sizePricing[selectedSize];
+  if (product && product.variants?.options) {
+    Object.keys(selectedVariants).forEach(optName => {
+      const choice = selectedVariants[optName];
+      if (choice) {
+        currentPrice += (choice.priceModifier || 0);
+        variantLabelArray.push(choice.label);
+      }
+    });
+  }
+  
+  const variantLabel = variantLabelArray.length > 0 ? variantLabelArray.join(' / ') : '';
 
   if (loading) {
     return <div className="page-transition container" style={{ paddingTop: '8rem', textAlign: 'center', minHeight: '60vh' }}><h2>Loading product...</h2></div>;
@@ -54,11 +76,15 @@ const ProductDetails = () => {
     );
   }
 
+  const handleAddToCart = () => {
+    addToCart(product, variantLabel, currentPrice);
+  };
+
   return (
     <div className="page-transition animate-fade-in product-details-page" style={{ paddingTop: '8rem', paddingBottom: '6rem' }}>
       <SEO 
         title={product.name} 
-        description={`Buy ${product.name} 3D Printed Figure. Premium ${product.category} merchandise. Scale 1/${product.scale}.`} 
+        description={product.description ? product.description.substring(0, 160) : `Buy ${product.name} 3D Printed Figure. Premium ${product.category} merchandise.`} 
         image={product.image}
         url={`/product/${product.id}`} 
       />
@@ -75,13 +101,12 @@ const ProductDetails = () => {
                 src={mainImage ? (mainImage.startsWith('http') ? mainImage : encodeURI(mainImage)) : (product.image?.startsWith('http') ? product.image : encodeURI(product.image || ''))} 
                 alt={product.name} 
                 className="main-image" 
-                onError={(e) => { e.target.src = 'https://via.placeholder.com/600x600?text=Image+Not+Found'; }}
+                onError={(e) => { e.target.src = '/Group 1.png'; }}
               />
             </div>
             
             {product.images && product.images.length > 0 && (
-              <div className="thumbnail-list">
-                {/* Ensure the main image is included if not in the list, and remove duplicates */}
+              <div className="thumbnail-list scrollable-tabs" style={{ paddingBottom: '10px' }}>
                 {[...new Set([product.image, ...product.images])].slice(0, 15).map((img, idx) => (
                   <button 
                     key={idx} 
@@ -103,6 +128,7 @@ const ProductDetails = () => {
             <div className="product-price-block">
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                 <span className="price-main">₹{currentPrice}</span>
+                {/* Visual discount for marketing */}
                 <span style={{ textDecoration: 'line-through', color: 'var(--text-secondary)', fontSize: '1.25rem' }}>
                   ₹{Math.round(currentPrice / 0.8)}
                 </span>
@@ -113,30 +139,34 @@ const ProductDetails = () => {
               <span className="price-shipping">Tax included.</span>
             </div>
             
-            <p className="product-description">
-              High-quality, meticulously detailed 3D printed figure of {product.name}. 
-              Manufactured with premium materials to ensure the best durability and visual fidelity. 
-              Perfect for collectors and anime enthusiasts.
+            <p className="product-description" style={{ whiteSpace: 'pre-wrap' }}>
+              {product.description || `High-quality, meticulously detailed 3D printed figure of ${product.name}. Manufactured with premium materials to ensure the best durability and visual fidelity. Perfect for collectors and enthusiasts.`}
             </p>
             
-            <div className="size-selector-container">
-              <h4 className="size-selector-title">Select Size (Height)</h4>
-              <div className="size-buttons">
-                {['10cm', '15cm', '25cm'].map(size => (
-                  <button 
-                    key={size}
-                    className={`size-btn ${selectedSize === size ? 'active' : ''}`}
-                    onClick={() => setSelectedSize(size)}
-                  >
-                    {size}
-                  </button>
-                ))}
+            {/* Dynamic Variant Selectors */}
+            {product.variants?.options?.map((option, idx) => (
+              <div key={idx} className="size-selector-container">
+                <h4 className="size-selector-title">{option.name}</h4>
+                <div className="size-buttons">
+                  {option.choices.map((choice, cIdx) => {
+                    const isSelected = selectedVariants[option.name]?.label === choice.label;
+                    return (
+                      <button 
+                        key={cIdx}
+                        className={`size-btn ${isSelected ? 'active' : ''}`}
+                        onClick={() => setSelectedVariants(prev => ({ ...prev, [option.name]: choice }))}
+                      >
+                        {choice.label} {choice.priceModifier > 0 ? `(+₹${choice.priceModifier})` : ''}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
-            </div>
+            ))}
 
             <button 
               className="btn-primary add-to-cart-large" 
-              onClick={() => addToCart(product, selectedSize, currentPrice)}
+              onClick={handleAddToCart}
             >
               <ShoppingCart size={22} /> Add to Cart - ₹{currentPrice}
             </button>

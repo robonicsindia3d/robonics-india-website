@@ -132,12 +132,15 @@
 }
 
 .mobile-nav-link {
-  display: block;
+  display: flex;
+  align-items: center;
   padding: 0.75rem 1rem;
+  min-height: 44px; /* iOS min touch target */
   font-weight: 600;
   color: var(--text-primary);
   border-radius: var(--radius-md);
   transition: var(--transition);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mobile-nav-link:hover {
