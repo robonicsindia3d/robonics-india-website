@@ -64,7 +64,20 @@ const Checkout = () => {
   const shippingCost = isFreeShipping ? 0 : 99;
   const total = Math.max(0, subtotal + shippingCost - discount);
 
-  // Fetch saved addresses
+  // Prefill user details
+  useEffect(() => {
+    if (currentUser) {
+      const names = currentUser.name ? currentUser.name.split(' ') : ['', ''];
+      setFormData(prev => ({
+        ...prev,
+        firstName: prev.firstName || names[0] || '',
+        lastName: prev.lastName || names.slice(1).join(' ') || '',
+        email: prev.email || currentUser.email || '',
+      }));
+    }
+  }, [currentUser]);
+
+  // Fetch saved addresses and auto-select default
   useEffect(() => {
     const apiUrl = import.meta.env.VITE_API_URL || '';
     if (token) {
@@ -75,6 +88,14 @@ const Checkout = () => {
         .then(data => {
           if (data.success && data.addresses.length > 0) {
             setSavedAddresses(data.addresses);
+            
+            // Auto-select default address if not already selected
+            if (!selectedAddressId) {
+              const defaultAddr = data.addresses.find(a => a.is_default) || data.addresses[0];
+              if (defaultAddr) {
+                selectAddress(defaultAddr);
+              }
+            }
           }
         })
         .catch(err => console.error('Failed to fetch addresses', err));
