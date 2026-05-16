@@ -201,6 +201,34 @@ app.post('/api/addresses', authenticateToken, async (req, res) => {
   }
 });
 
+app.put('/api/addresses/:id', authenticateToken, async (req, res) => {
+  const { label, full_name, phone, address_line1, address_line2, city, state, pincode, is_default } = req.body;
+  try {
+    if (is_default) {
+      await pool.query('UPDATE addresses SET is_default = 0 WHERE user_id = $1', [req.user.id]);
+    }
+    const { rowCount } = await pool.query(
+      `UPDATE addresses SET label = $1, full_name = $2, phone = $3, address_line1 = $4, address_line2 = $5, city = $6, state = $7, pincode = $8, is_default = $9 
+       WHERE id = $10 AND user_id = $11`,
+      [label, full_name, phone, address_line1, address_line2, city, state, pincode, is_default ? 1 : 0, req.params.id, req.user.id]
+    );
+    if (rowCount === 0) return res.status(404).json({ success: false, message: 'Address not found' });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+app.delete('/api/addresses/:id', authenticateToken, async (req, res) => {
+  try {
+    const { rowCount } = await pool.query('DELETE FROM addresses WHERE id = $1 AND user_id = $2', [req.params.id, req.user.id]);
+    if (rowCount === 0) return res.status(404).json({ success: false, message: 'Address not found' });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 // --- PRODUCTS ---
 app.get('/api/products', async (req, res) => {
   try {
