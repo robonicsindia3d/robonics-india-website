@@ -5,6 +5,20 @@ import { AuthContext } from '../context/AuthContext';
 import { CheckCircle, ShieldCheck, MapPin, ArrowRight, ArrowLeft } from 'lucide-react';
 import './Checkout.css';
 
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 const Checkout = () => {
   const { cartItems, getCartTotal, clearCart } = useContext(CartContext);
   const { currentUser, token } = useContext(AuthContext);
@@ -177,7 +191,12 @@ const Checkout = () => {
         body: JSON.stringify({ amount: total, customerName: fullName, customerEmail: formData.email, customerPhone: formData.phone, shippingAddress: sAddr, billingAddress: bAddr, items: cartItems })
       });
       const orderData = await orderRes.json();
-      if (!orderData.success) throw new Error('Order creation failed');
+      if (!orderData.success) throw new Error(orderData.message || 'Order creation failed on backend');
+
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        throw new Error('Razorpay SDK failed to load. Please check your internet connection.');
+      }
 
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
@@ -204,7 +223,8 @@ const Checkout = () => {
       const rzp1 = new window.Razorpay(options);
       rzp1.open();
     } catch (error) {
-      alert("Payment Error.");
+      console.error(error);
+      alert("Payment Error: " + (error.message || JSON.stringify(error)));
       setIsProcessing(false);
     }
   };

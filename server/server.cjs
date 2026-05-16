@@ -293,6 +293,7 @@ const razorpay = new Razorpay({
 });
 
 app.post('/api/create-order', optionalAuth, async (req, res) => {
+  console.log('📦 Received Order Request:', req.body);
   try {
     const { amount, customerName, customerEmail, customerPhone, shippingAddress, billingAddress, items } = req.body;
     const userId = req.user ? req.user.id : null;
@@ -305,7 +306,9 @@ app.post('/api/create-order', optionalAuth, async (req, res) => {
     );
     res.json({ success: true, order });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
+    console.error('❌ Error creating order:', error);
+    const errorMsg = error?.error?.description || error.message || JSON.stringify(error) || 'Internal Server Error';
+    res.status(500).json({ success: false, message: errorMsg });
   }
 });
 
