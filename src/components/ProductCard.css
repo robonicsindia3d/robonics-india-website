@@ -165,17 +165,24 @@
 }
 @media (max-width: 768px) {
   .product-overlay {
-    position: static;
-    opacity: 1;
-    transform: none;
-    background: none;
-    padding: 0 1.25rem 1.25rem;
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    opacity: 1 !important;
+    transform: none !important;
+    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent) !important;
+    padding: 0.75rem !important;
+    display: flex !important;
+    justify-content: center !important;
+    z-index: 5 !important;
   }
   
   .add-to-cart-btn {
     border-radius: var(--radius-md);
     background-color: var(--primary-blue);
     color: white;
+    font-weight: 700;
   }
 
   .product-footer {

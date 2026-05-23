@@ -2,8 +2,8 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
 const SEO = ({ title, description, image, url }) => {
-  const siteTitle = 'RobonicsIndia 3D - Premium Anime Figures';
-  const defaultDescription = 'High-quality, meticulously detailed 3D printed anime figures and custom printing services in India.';
+  const siteTitle = 'RoboPrint 3D - Premium Anime Figures';
+  const defaultDescription = 'High-quality, meticulously detailed 3D printed anime figures and custom artistic printing services in India.';
   const defaultImage = 'https://robonicsindia3d.com/Group%201.png'; // Update to a real absolute URL when deployed
   const siteUrl = 'https://robonicsindia3d.com'; // Update to real domain
 

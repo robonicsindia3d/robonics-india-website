@@ -261,7 +261,7 @@ app.post('/api/admin/upload', authenticateAdmin, upload.single('image'), async (
   if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' });
   try {
     const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: 'robonics_products'
+      folder: 'roboprint_products'
     });
     fs.unlinkSync(req.file.path); // Delete temp file
     res.json({ success: true, url: result.secure_url });

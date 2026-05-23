@@ -5,12 +5,35 @@ const CustomPrint = () => {
   return (
     <div className="page-transition animate-fade-in" style={{ paddingTop: '8rem', paddingBottom: '4rem', backgroundColor: 'var(--bg-secondary)' }}>
       <div className="container">
-        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <h1 style={{ marginBottom: '1rem', fontSize: '3rem' }}>Custom 3D Printing Service</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.25rem', maxWidth: '800px', margin: '0 auto' }}>
             Have your own STL or OBJ file? Upload it here and specify your requirements. 
             We'll review your model and send you a custom quote within 24 hours.
           </p>
+        </div>
+        
+        {/* Compliance Warning Card */}
+        <div style={{
+          maxWidth: '800px',
+          margin: '0 auto 2.5rem',
+          padding: '1.5rem 2rem',
+          backgroundColor: '#fffbeb',
+          border: '1px solid #fef3c7',
+          borderRadius: 'var(--radius-lg)',
+          boxShadow: 'var(--shadow-sm)',
+          display: 'flex',
+          gap: '1rem',
+          alignItems: 'flex-start',
+          transition: 'transform 0.2s hover'
+        }} className="compliance-card">
+          <span style={{ fontSize: '1.75rem', lineHeight: '1' }}>⚠️</span>
+          <div>
+            <h4 style={{ color: '#92400e', marginBottom: '0.25rem', fontWeight: '700', fontSize: '1rem' }}>Safety & Compliance Policy</h4>
+            <p style={{ color: '#b45309', fontSize: '0.875rem', lineHeight: '1.6', margin: '0' }}>
+              We are strictly committed to safety and regulatory compliance. We do <strong>NOT</strong> manufacture or print weapons, functional firearm components, drones, quadcopters, UAV parts, aerospace components, or regulated industrial/military equipment. Submissions containing any such models will be automatically rejected, and any payments will be refunded immediately.
+            </p>
+          </div>
         </div>
         
         <CustomPrintForm />

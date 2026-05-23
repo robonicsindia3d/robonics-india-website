@@ -38,7 +38,7 @@ const Home = () => {
       <section className="features-section" style={{ padding: '4rem 0', backgroundColor: 'var(--bg-secondary)' }}>
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-            <h2>Why Choose RobonicsIndia 3D?</h2>
+            <h2>Why Choose RoboPrint 3D?</h2>
             <p style={{ color: 'var(--text-secondary)' }}>Premium quality is our standard.</p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem' }}>

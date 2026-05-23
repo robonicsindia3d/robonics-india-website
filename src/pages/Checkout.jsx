@@ -223,7 +223,7 @@ const Checkout = () => {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: orderData.order.amount,
         currency: 'INR',
-        name: 'RobonicsIndia 3D',
+        name: 'RoboPrint 3D',
         order_id: orderData.order.id,
         handler: async function (response) {
           const verifyRes = await fetch(`${apiUrl}/api/verify-payment`, {

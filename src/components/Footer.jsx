@@ -9,8 +9,8 @@ const Footer = () => {
       <div className="container footer-content">
         <div className="footer-brand">
           <Link to="/" className="footer-logo">
-            <img src="/Group 1.png" alt="RobonicsIndia 3D Logo" style={{ height: '40px', width: 'auto' }} onError={(e) => e.target.style.display='none'} />
-            <span>RobonicsIndia 3D</span>
+            <img src="/Group 1.png" alt="RoboPrint 3D Logo" style={{ height: '40px', width: 'auto' }} onError={(e) => e.target.style.display='none'} />
+            <span>RoboPrint 3D</span>
           </Link>
           <p className="footer-description">
             Bringing your favorite anime characters to life with premium 3D printing technology and hand-finished details.
@@ -48,7 +48,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} RobonicsIndia 3D. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} RoboPrint 3D. All rights reserved.</p>
       </div>
     </footer>
   );
