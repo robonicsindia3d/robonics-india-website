@@ -62,7 +62,7 @@ const Checkout = () => {
   // Flat ₹99 for orders < 1500, else Free
   const isFreeShipping = subtotal >= 1500;
   const shippingCost = isFreeShipping ? 0 : 99;
-  const total = Math.max(0, subtotal + shippingCost - discount);
+  const total = Math.round(Math.max(0, subtotal + shippingCost - discount));
 
   // Prefill user details
   useEffect(() => {
