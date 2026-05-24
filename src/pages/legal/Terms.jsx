@@ -4,7 +4,7 @@ const Terms = () => (
   <div className="page-transition container" style={{ paddingTop: '8rem', paddingBottom: '6rem', maxWidth: '800px' }}>
     <h1 style={{ marginBottom: '2rem' }}>Terms & Conditions</h1>
     <div style={{ lineHeight: '1.8', color: 'var(--text-secondary)' }}>
-      <p>Welcome to RoboPrint 3D. By accessing our website, you agree to these Terms and Conditions.</p>
+      <p>Welcome to RobonicsIndia 3D. By accessing our website, you agree to these Terms and Conditions.</p>
       
       <h3 style={{ color: 'var(--text-primary)', marginTop: '2rem', marginBottom: '1rem' }}>1. Custom Prints & Compliance</h3>
       <p>All custom 3D printing orders are final once production begins. We reserve the right to refuse printing any copyrighted material or inappropriate content. 

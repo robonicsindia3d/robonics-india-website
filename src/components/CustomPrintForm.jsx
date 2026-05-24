@@ -18,7 +18,7 @@ const CustomPrintForm = () => {
   };
 
   const handleSubmit = (e) => {
-    e.formAction = `mailto:roboprint3d.india@gmail.com?subject=Custom Print Request from ${formData.name}&body=Filament: ${formData.filament}%0D%0AInfill: ${formData.infill}%0D%0AColor: ${formData.color}%0D%0ADetails: ${formData.details}`;
+    e.formAction = `mailto:robonicsindia3d@gmail.com?subject=Custom Print Request from ${formData.name}&body=Filament: ${formData.filament}%0D%0AInfill: ${formData.infill}%0D%0AColor: ${formData.color}%0D%0ADetails: ${formData.details}`;
     setIsSubmitted(true);
     // In a real app, this would be an API call to a backend service like Formspree, SendGrid, or a custom node server.
     // For now, we are relying on mailto link behavior or just showing a success state.

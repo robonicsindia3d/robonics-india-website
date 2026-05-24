@@ -34,11 +34,34 @@ const Home = () => {
       ) : (
         <ProductGrid products={productsData} limit={4} />
       )}
+
+      {/* Trust & Compliance Reassurance Banner */}
+      <section className="compliance-banner" style={{ padding: '3rem 0', background: 'white' }}>
+        <div className="container" style={{ maxWidth: '900px' }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+            padding: '2.5rem 2rem',
+            background: 'var(--bg-secondary)',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--border-color)',
+            boxShadow: 'var(--shadow-sm)'
+          }}>
+            <span style={{ fontSize: '2.25rem', marginBottom: '0.75rem' }}>🎨</span>
+            <h3 style={{ fontSize: '1.5rem', marginBottom: '0.75rem', color: 'var(--text-primary)', fontWeight: '700' }}>Artistic Figurine & Craft Studio</h3>
+            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6', fontSize: '0.95rem', margin: '0 auto', maxWidth: '750px' }}>
+              RobonicsIndia 3D is a dedicated creative printing hub. We design and manufacture high-fidelity plastic anime figures, custom tabletop models, and novelty gifts. <strong>Please Note:</strong> We strictly operate as a decorative craft shop and do NOT sell, supply, or design drones, aircraft electronics, telemetry equipment, or commercial robotics machinery.
+            </p>
+          </div>
+        </div>
+      </section>
       
       <section className="features-section" style={{ padding: '4rem 0', backgroundColor: 'var(--bg-secondary)' }}>
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-            <h2>Why Choose RoboPrint 3D?</h2>
+            <h2>Why Choose RobonicsIndia 3D?</h2>
             <p style={{ color: 'var(--text-secondary)' }}>Premium quality is our standard.</p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem' }}>

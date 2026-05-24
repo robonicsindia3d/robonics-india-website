@@ -27,8 +27,8 @@ const Navbar = () => {
     <nav className={`navbar ${isScrolled ? 'glass-nav scrolled' : ''}`}>
       <div className="container navbar-content">
         <Link to="/" className="navbar-logo">
-          <img src="/Group 1.png" alt="RoboPrint 3D Logo" style={{ height: '40px', width: 'auto' }} onError={(e) => e.target.style.display='none'} />
-          <span>RoboPrint 3D</span>
+          <img src="/Group 1.png" alt="RobonicsIndia 3D Logo" style={{ height: '40px', width: 'auto' }} onError={(e) => e.target.style.display='none'} />
+          <span>RobonicsIndia 3D</span>
         </Link>
 
         <div className="navbar-links desktop-only">

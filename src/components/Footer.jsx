@@ -9,8 +9,8 @@ const Footer = () => {
       <div className="container footer-content">
         <div className="footer-brand">
           <Link to="/" className="footer-logo">
-            <img src="/Group 1.png" alt="RoboPrint 3D Logo" style={{ height: '40px', width: 'auto' }} onError={(e) => e.target.style.display='none'} />
-            <span>RoboPrint 3D</span>
+            <img src="/Group 1.png" alt="RobonicsIndia 3D Logo" style={{ height: '40px', width: 'auto' }} onError={(e) => e.target.style.display='none'} />
+            <span>RobonicsIndia 3D</span>
           </Link>
           <p className="footer-description">
             Bringing your favorite anime characters to life with premium 3D printing technology and hand-finished details.
@@ -47,8 +47,11 @@ const Footer = () => {
           </form>
         </div>
       </div>
-      <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} RoboPrint 3D. All rights reserved.</p>
+      <div className="footer-bottom" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem' }}>
+        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', maxWidth: '800px', textAlign: 'center', lineHeight: '1.6', margin: '0 auto' }}>
+          <strong>Compliance Disclaimer:</strong> RobonicsIndia 3D is strictly an artistic 3D printing and custom figurine storefront specializing in hobbyist collectibles, anime models, and cosplay props. We do <strong>NOT</strong> manufacture, distribute, or sell drones, quadcopters, UAV parts, remote-controlled aviation components, or electronics of any kind. We are completely independent of any industrial robotics parts suppliers.
+        </p>
+        <p style={{ margin: '0' }}>&copy; {new Date().getFullYear()} RobonicsIndia 3D. All rights reserved.</p>
       </div>
     </footer>
   );
