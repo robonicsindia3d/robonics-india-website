@@ -145,7 +145,7 @@ const Dashboard = () => {
   if (!currentUser) return null;
 
   return (
-    <div className="page-transition animate-fade-in" style={{ paddingTop: '8rem', paddingBottom: '6rem', minHeight: '70vh' }}>
+    <div className="page-transition animate-fade-in dashboard-page page-container">
       <div className="container">
         <div className="dashboard-header">
           <div className="user-profile-header">
@@ -153,7 +153,7 @@ const Dashboard = () => {
               <User size={32} />
             </div>
             <div>
-              <h1 style={{ marginBottom: '0.25rem' }}>Welcome, {currentUser.name}</h1>
+              <h1 style={{ marginBottom: '0.25rem' }} className="page-title">Welcome, {currentUser.name}</h1>
               <p style={{ color: 'var(--text-secondary)' }}>{currentUser.email}</p>
             </div>
           </div>

@@ -10,10 +10,10 @@ const Wishlist = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="page-transition animate-fade-in" style={{ paddingTop: '8rem', paddingBottom: '6rem', minHeight: '70vh' }}>
+    <div className="page-transition animate-fade-in page-container">
       <div className="container">
-        <h1 style={{ marginBottom: '1rem' }}>Your Wishlist</h1>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '3rem' }}>
+        <h1 className="page-title">Your Wishlist</h1>
+        <p className="page-subtitle">
           {wishlistItems.length} {wishlistItems.length === 1 ? 'item' : 'items'} saved
         </p>
         
