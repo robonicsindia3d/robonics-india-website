@@ -239,7 +239,12 @@ const Checkout = () => {
           setIsProcessing(false);
         },
         prefill: { name: fullName, email: formData.email, contact: formData.phone },
-        theme: { color: '#1e40af' }
+        theme: { color: '#1e40af' },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+          }
+        }
       };
       const rzp1 = new window.Razorpay(options);
       rzp1.open();
