@@ -80,9 +80,29 @@
   .category-list {
     flex-direction: row;
     flex-wrap: wrap;
+    gap: 0.5rem;
   }
   
   .category-btn {
     width: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .shop-sidebar {
+    padding: 1rem;
+  }
+  .category-list {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.25rem;
+    scrollbar-width: none; /* Firefox */
+  }
+  .category-list::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+  .category-btn {
+    white-space: nowrap;
   }
 }

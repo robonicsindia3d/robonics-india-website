@@ -32,9 +32,9 @@ const Cart = () => {
   const total = subtotal + shipping;
 
   return (
-    <div className="page-transition animate-fade-in cart-page" style={{ paddingTop: '8rem', paddingBottom: '6rem', minHeight: '60vh' }}>
+    <div className="page-transition animate-fade-in cart-page page-container">
       <div className="container">
-        <h1 style={{ marginBottom: '1rem' }}>Your Shopping Cart</h1>
+        <h1 className="page-title">Your Shopping Cart</h1>
         
         {/* Free Shipping Promotion */}
         <div style={{ 

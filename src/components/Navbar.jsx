@@ -37,31 +37,47 @@ const Navbar = () => {
           <Link to="/custom-print" className="nav-link">Custom Print</Link>
         </div>
 
-        <div className="navbar-actions desktop-only">
+        <div className="navbar-actions animate-fade-in" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           {currentUser?.role === 'admin' && (
-            <Link to="/admin" className="cart-button" style={{ color: 'var(--primary-blue)', textDecoration: 'none' }}>
+            <Link to="/admin" className="cart-button desktop-only" style={{ color: 'var(--primary-blue)', textDecoration: 'none' }}>
               <span style={{ fontSize: '0.875rem', fontWeight: '600' }}>Admin</span>
             </Link>
           )}
-          <Link to="/wishlist" className="cart-button">
+          <Link to="/wishlist" className="cart-button desktop-only">
             <Heart size={20} />
             {wishlistItems.length > 0 && <span className="cart-badge">{wishlistItems.length}</span>}
           </Link>
-          <Link to={currentUser ? "/dashboard" : "/login"} className="cart-button">
+          <Link to={currentUser ? "/dashboard" : "/login"} className="cart-button desktop-only">
             <User size={20} />
           </Link>
-          <Link to="/cart" className="cart-button">
+          <Link to="/cart" className="cart-button" style={{ WebkitTapHighlightColor: 'transparent' }}>
             <ShoppingCart size={20} />
             {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}
           </Link>
-        </div>
 
-        <button 
-          className="mobile-menu-button mobile-only"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+          {/* Mobile hamburger menu (mobile-only) */}
+          <button 
+            className="mobile-menu-button mobile-only"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              width: '40px', 
+              height: '40px', 
+              borderRadius: 'var(--radius-full)', 
+              backgroundColor: 'var(--bg-primary)', 
+              boxShadow: 'var(--shadow-sm)',
+              color: 'var(--text-primary)',
+              cursor: 'pointer',
+              border: 'none',
+              transition: 'var(--transition)',
+              WebkitTapHighlightColor: 'transparent'
+            }}
+          >
+            {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}

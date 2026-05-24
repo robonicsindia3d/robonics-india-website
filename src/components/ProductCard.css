@@ -191,3 +191,9 @@
     margin-bottom: 0.5rem;
   }
 }
+
+@media (max-width: 600px) {
+  .card-size-selector {
+    display: none !important;
+  }
+}

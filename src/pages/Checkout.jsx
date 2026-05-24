@@ -280,7 +280,7 @@ const Checkout = () => {
   }
 
   return (
-    <div className="page-transition animate-fade-in checkout-page" style={{ paddingTop: '8rem', paddingBottom: '6rem' }}>
+    <div className="page-transition animate-fade-in checkout-page page-container">
       <div className="container">
         <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '3rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: step >= 1 ? 'var(--primary-blue)' : 'var(--text-secondary)', fontWeight: 700 }}>

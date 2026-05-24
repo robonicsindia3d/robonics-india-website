@@ -34,15 +34,15 @@ const Shop = () => {
   }, [selectedCategory, productsData]);
 
   return (
-    <div className="page-transition animate-fade-in shop-page" style={{ paddingTop: '8rem', paddingBottom: '6rem' }}>
+    <div className="page-transition animate-fade-in shop-page page-container">
       <SEO 
         title="Shop 3D Anime Figures" 
         description="Browse our extensive catalog of high-quality 3D printed anime figures. Filter by your favorite anime series like Naruto, One Piece, DBZ, and more." 
         url="/shop" 
       />
       <div className="container">
-        <h1 style={{ marginBottom: '1rem', fontSize: '3rem' }}>All Figures</h1>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '3rem', fontSize: '1.25rem' }}>
+        <h1 className="page-title">All Figures</h1>
+        <p className="page-subtitle">
           Browse our entire collection of premium 3D printed anime figures.
         </p>
       </div>

@@ -119,3 +119,9 @@ textarea:focus {
 .mt-4 {
   margin-top: 1rem;
 }
+
+@media (max-width: 768px) {
+  .custom-print-form {
+    padding: 1.5rem;
+  }
+}

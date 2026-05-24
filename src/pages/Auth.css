@@ -484,3 +484,16 @@
   color: var(--primary-blue);
   border-bottom-color: var(--primary-blue);
 }
+
+@media (max-width: 500px) {
+  .address-form-overlay {
+    padding: 1rem;
+  }
+  .address-form-modal {
+    padding: 1.5rem;
+  }
+  .address-form-modal .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}

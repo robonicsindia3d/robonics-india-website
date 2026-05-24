@@ -3,11 +3,11 @@ import CustomPrintForm from '../components/CustomPrintForm';
 
 const CustomPrint = () => {
   return (
-    <div className="page-transition animate-fade-in" style={{ paddingTop: '8rem', paddingBottom: '4rem', backgroundColor: 'var(--bg-secondary)' }}>
+    <div className="page-transition animate-fade-in page-container" style={{ backgroundColor: 'var(--bg-secondary)' }}>
       <div className="container">
-        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-          <h1 style={{ marginBottom: '1rem', fontSize: '3rem' }}>Custom 3D Printing Service</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1.25rem', maxWidth: '800px', margin: '0 auto' }}>
+        <div style={{ textAlign: 'center' }}>
+          <h1 className="page-title">Custom 3D Printing Service</h1>
+          <p className="page-subtitle" style={{ maxWidth: '800px', margin: '0 auto' }}>
             Have your own STL or OBJ file? Upload it here and specify your requirements. 
             We'll review your model and send you a custom quote within 24 hours.
           </p>
@@ -18,14 +18,6 @@ const CustomPrint = () => {
           maxWidth: '800px',
           margin: '0 auto 2.5rem',
           padding: '1.5rem 2rem',
-          backgroundColor: '#fffbeb',
-          border: '1px solid #fef3c7',
-          borderRadius: 'var(--radius-lg)',
-          boxShadow: 'var(--shadow-sm)',
-          display: 'flex',
-          gap: '1rem',
-          alignItems: 'flex-start',
-          transition: 'transform 0.2s hover'
         }} className="compliance-card">
           <span style={{ fontSize: '1.75rem', lineHeight: '1' }}>⚠️</span>
           <div>
